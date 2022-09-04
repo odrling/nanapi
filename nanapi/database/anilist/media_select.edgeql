@@ -1,0 +1,25 @@
+with
+  ids_al := <array<int32>>$ids_al
+select anilist::Media {
+  id_al,
+  favourites,
+  site_url,
+  type,
+  id_mal,
+  title_user_preferred,
+  title_native,
+  title_english,
+  synonyms,
+  description,
+  status,
+  season,
+  season_year,
+  episodes,
+  duration,
+  chapters,
+  cover_image_extra_large,
+  cover_image_color,
+  popularity,
+  is_adult,
+  genres,
+} filter .id_al in array_unpack(ids_al)

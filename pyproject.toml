@@ -1,0 +1,83 @@
+[tool.poetry]
+name = "nanapi"
+version = "0.1.0"
+description = ""
+authors = ["NextFire <git@yuru.moe>", "odrling <florianbadie@odrling.xyz>"]
+readme = "README.md"
+
+[tool.poetry.scripts]
+nanapi = "nanapi.__main__:main"
+
+[tool.poetry.dependencies]
+python = "~3.12"
+edgedb = "1.9.0"
+fastapi = "0.110.2"
+uvloop = "0.19.0"
+pydantic = "2.7.1"
+aiohttp = { version = "3.9.5", extras = ["speedups"] }
+# https://github.com/PyYoshi/cChardet/issues/81
+faust-cchardet = "2.1.19"
+orjson = "3.10.1"
+toolz = "0.12.1"
+backoff = "2.2.1"
+meilisearch-python-sdk = "2.8.0"
+numpy = "1.26.4"
+pillow = "10.3.0"
+rich = "13.7.1"
+discord-webhook = { version = "1.3.1", extras = ["async"] }
+python-multipart = "0.0.9"
+passlib = { version = "1.7.4", extras = ["bcrypt"] }
+python-jose = { version = "3.3.0", extras = ["cryptography"] }
+cachetools = "5.3.3"
+asyncache = "0.3.1"
+polars = "0.20.22"
+scikit-learn = "1.4.2"
+hypercorn = "0.16.0"
+tzdata = "2024.1"
+
+[tool.poetry.group.dev.dependencies]
+pyright = "1.1.360"
+ruff = "0.4.1"
+edgedb-pydantic-codegen = "2024.4.2"
+uvicorn = { version = "0.29.0", extras = ["standard"] }
+pyinstrument = "4.6.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.pyright]
+ignore = [
+    "nanapi/database", # FIXME: https://github.com/microsoft/pyright/issues/7228
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 99
+exclude = [
+    "nanapi/database",
+    "nanapi/nanachan_v2_migrate.py",
+    "nanapi/local_settings.py",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "SIM", "I"]
+ignore = [
+    # lambda expressions
+    "E731",
+    # ambiguous variable name
+    "E741",
+    # Do not perform function calls in argument defaults
+    "B008",
+    # Within an except clause, raise exceptions with `raise ... from err` or `raise ... from None`
+    "B904",
+    # `zip()` without an explicit `strict=` parameter
+    "B905",
+    # Use `contextlib.suppress(asyncio.CancelledError)` instead of try-except-pass
+    "SIM105",
+    # Use ternary operator `{contents}` instead of if-else-block
+    "SIM108",
+]
+
+[tool.ruff.format]
+quote-style = "single"
