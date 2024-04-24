@@ -3,7 +3,7 @@
 ## Clone nanapi
 
 ```sh
-git clone https://git.japan7.bde.enseeiht.fr/Japan7/nanapi.git
+git clone https://github.com/Japan7/nanapi.git
 ```
 
 ## Setup EdgeDB
