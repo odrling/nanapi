@@ -133,9 +133,6 @@ jobs:
         with:
           webhook: ${{ secrets.DISCORD_WEBHOOK }}
 
-    outputs:
-      digest: ${{ steps.build-and-push.outputs.digest }}
-
   deploy:
     if: (github.event_name != 'pull_request') && !startsWith(github.ref, 'refs/heads/renovate')
     needs: build
@@ -149,22 +146,26 @@ jobs:
         with:
           repository: Japan7/nanak8s
           token: ${{ secrets.NANAK8S_PAT }}
-      - name: Checkout repository .github
-        uses: actions/checkout@v4
-        with:
-          path: nanapi
-          sparse-checkout: |
-            .github
       - name: Set deploy environment
         id: deploy_env
-        run: nanapi/.github/workflows/deploy_env.py ${{ needs.build.outputs.digest }}
+        run: |
+          if [[ "$GITHUB_REF" == "refs/tags/"* ]]; then
+            echo "::set-output name=name::prod"
+            echo "::set-output name=tag::${GITHUB_REF#refs/tags/}"
+          elif [[ "$GITHUB_REF" == "refs/heads/${MAIN_BRANCH}" ]]; then
+            echo "::set-output name=name::staging"
+            echo "::set-output name=tag::sha-${GITHUB_SHA::7}"
+          else
+            echo "::set-output name=name::dev"
+            echo "::set-output name=tag::sha-${GITHUB_SHA::7}"
+          fi
       - name: Update nanak8s
         run: |
           yq e -i '(.environments.${{ steps.deploy_env.outputs.name }}.values[] | select(has("tag"))).tag = "${{ steps.deploy_env.outputs.tag }}"' apps/nanapi/environments.yaml
           git add apps/nanapi/environments.yaml
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
-          git commit -m "[CI] Update nanapi-${{ steps.deploy_env.outputs.name }} to ${{ steps.deploy_env.outputs.pretty }}" -m "https://github.com/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
+          git commit -m "[CI] Update nanapi-${{ steps.deploy_env.outputs.name }} to ${{ steps.deploy_env.outputs.tag }}" -m "https://github.com/$GITHUB_REPOSITORY/commit/$GITHUB_SHA"
           git push
       - uses: sarisia/actions-status-discord@v1
         if: failure()
