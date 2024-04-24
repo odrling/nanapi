@@ -2,8 +2,14 @@
 name = "nanapi"
 version = "0.1.0"
 description = ""
-authors = ["NextFire <git@yuru.moe>", "odrling <florianbadie@odrling.xyz>"]
+authors = [
+    "NextFire <git@yuru.moe>",
+    "odrling <florianbadie@odrling.xyz>",
+    "Pierre Jeanjean <rhiobet@gmail.com>",
+]
+license = "MIT"
 readme = "README.md"
+repository = "https://github.com/Japan7/nanapi"
 
 [tool.poetry.scripts]
 nanapi = "nanapi.__main__:main"
