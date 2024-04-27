@@ -1,9 +1,9 @@
 import secrets
 from datetime import datetime, timedelta
 
+import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials, OAuth2PasswordBearer
-from jose import jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
 
