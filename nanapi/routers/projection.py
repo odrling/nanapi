@@ -67,7 +67,7 @@ async def get_projections(status: PROJO_SELECT_STATUS | None = None,
                                       status_code=status.HTTP_201_CREATED)
 async def new_projection(body: NewProjectionBody,
                          edgedb: AsyncIOClient = Depends(get_client_edgedb)):
-    return await projo_insert(edgedb, **body.dict())
+    return await projo_insert(edgedb, **body.model_dump())
 
 
 @router.oauth2_client.get(
@@ -102,7 +102,7 @@ async def set_projection_name(
         id: UUID,
         body: SetProjectionNameBody,
         edgedb: AsyncIOClient = Depends(get_client_edgedb)):
-    resp = await projo_update_name(edgedb, id=id, **body.dict())
+    resp = await projo_update_name(edgedb, id=id, **body.model_dump())
     if resp is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return resp
@@ -116,7 +116,7 @@ async def set_projection_status(
         id: UUID,
         body: SetProjectionStatusBody,
         edgedb: AsyncIOClient = Depends(get_client_edgedb)):
-    resp = await projo_update_status(edgedb, id=id, **body.dict())
+    resp = await projo_update_status(edgedb, id=id, **body.model_dump())
     if resp is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return resp
@@ -130,7 +130,7 @@ async def set_projection_message_id(
         id: UUID,
         body: SetProjectionMessageIdBody,
         edgedb: AsyncIOClient = Depends(get_client_edgedb)):
-    resp = await projo_update_message_id(edgedb, id=id, **body.dict())
+    resp = await projo_update_message_id(edgedb, id=id, **body.model_dump())
     if resp is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return resp
@@ -167,7 +167,7 @@ async def add_projection_external_media(
         id: UUID,
         body: ProjoAddExternalMediaBody,
         edgedb: AsyncIOClient = Depends(get_client_edgedb)):
-    resp = await projo_add_external_media(edgedb, id=id, **body.dict())
+    resp = await projo_add_external_media(edgedb, id=id, **body.model_dump())
     if resp is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return resp
@@ -211,7 +211,7 @@ async def new_projection_event(
         id: UUID,
         body: NewProjectionEventBody,
         edgedb: AsyncIOClient = Depends(get_client_edgedb)):
-    resp = await projo_add_event(edgedb, id=id, **body.dict())
+    resp = await projo_add_event(edgedb, id=id, **body.model_dump())
     if resp is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return resp

@@ -37,7 +37,7 @@ router = NanAPIRouter(prefix='/quizz', tags=['quizz'])
                                       status_code=status.HTTP_201_CREATED)
 async def new_quizz(body: NewQuizzBody,
                     edgedb: AsyncIOClient = Depends(get_client_edgedb)):
-    return await quizz_insert(edgedb, **body.dict())
+    return await quizz_insert(edgedb, **body.model_dump())
 
 
 @router.oauth2_client.get(
@@ -83,7 +83,7 @@ async def delete_quizz(id: UUID,
 async def set_quizz_answer(id: UUID,
                            body: SetQuizzAnswerBody,
                            edgedb: AsyncIOClient = Depends(get_client_edgedb)):
-    resp = await quizz_set_answer(edgedb, id=id, **body.dict())
+    resp = await quizz_set_answer(edgedb, id=id, **body.model_dump())
     if resp is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return resp
@@ -103,7 +103,7 @@ async def get_games(status: GAME_SELECT_STATUS,
 async def new_game(body: NewGameBody,
                    edgedb: AsyncIOClient = Depends(get_client_edgedb)):
     try:
-        return await game_new(edgedb, **body.dict())
+        return await game_new(edgedb, **body.model_dump())
     except ConstraintViolationError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
 
@@ -164,7 +164,7 @@ async def set_game_bananed_answer(
         id: UUID,
         body: SetGameBananedAnswerBody,
         edgedb: AsyncIOClient = Depends(get_client_edgedb)):
-    resp = await game_update_bananed(edgedb, id=id, **body.dict())
+    resp = await game_update_bananed(edgedb, id=id, **body.model_dump())
     if resp is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return resp
@@ -177,7 +177,7 @@ async def set_game_bananed_answer(
 async def end_game(id: UUID,
                    body: EndGameBody,
                    edgedb: AsyncIOClient = Depends(get_client_edgedb)):
-    resp = await game_end(edgedb, id=id, **body.dict())
+    resp = await game_end(edgedb, id=id, **body.model_dump())
     if resp is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return resp

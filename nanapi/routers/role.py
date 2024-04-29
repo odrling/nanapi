@@ -27,7 +27,7 @@ async def get_roles(edgedb: AsyncIOClient = Depends(get_client_edgedb)):
 async def new_role(body: NewRoleBody,
                    edgedb: AsyncIOClient = Depends(get_client_edgedb)):
     try:
-        return await role_insert_select(edgedb, **body.dict())
+        return await role_insert_select(edgedb, **body.model_dump())
     except ConstraintViolationError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
 

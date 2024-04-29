@@ -33,7 +33,7 @@ async def histoire_index(edgedb: AsyncIOClient = Depends(get_client_edgedb)):
 async def new_histoire(body: NewHistoireBody,
                        edgedb: AsyncIOClient = Depends(get_client_edgedb)):
     try:
-        return await histoire_insert(edgedb, **body.dict())
+        return await histoire_insert(edgedb, **body.model_dump())
     except ConstraintViolationError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
 

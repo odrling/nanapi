@@ -172,7 +172,7 @@ async def get_players(chara_id_al: int | None = None,
 async def upsert_player(discord_id: int,
                         body: UpsertPlayerBody,
                         edgedb: AsyncIOClient = Depends(get_client_edgedb)):
-    return await player_merge(edgedb, discord_id=discord_id, **body.dict())
+    return await player_merge(edgedb, discord_id=discord_id, **body.model_dump())
 
 
 @router.oauth2_client.get(
@@ -200,7 +200,7 @@ async def add_player_coins(discord_id: int,
     try:
         resp = await player_add_coins(edgedb,
                                       discord_id=discord_id,
-                                      **body.dict())
+                                      **body.model_dump())
     except ConstraintViolationError as e:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT, detail=str(e))
@@ -835,7 +835,7 @@ async def bulk_update_waifus(
                       if len(ids) > 0 else [])
     except ValueError:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
-    return await waifu_bulk_update(edgedb, ids=parsed_ids, **body.dict())
+    return await waifu_bulk_update(edgedb, ids=parsed_ids, **body.model_dump())
 
 
 @router.oauth2_client_restricted.post('/waifus/reroll',
@@ -937,7 +937,7 @@ async def blood_expired_waifus(discord_id: int,
 async def customize_waifu(id: UUID,
                           body: CustomizeWaifuBody,
                           edgedb: AsyncIOClient = Depends(get_client_edgedb)):
-    resp = await waifu_update_custom_image_name(edgedb, id=id, **body.dict())
+    resp = await waifu_update_custom_image_name(edgedb, id=id, **body.model_dump())
     if resp is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return resp
@@ -950,7 +950,7 @@ async def customize_waifu(id: UUID,
 async def reorder_waifu(id: UUID,
                         body: ReorderWaifuBody,
                         edgedb: AsyncIOClient = Depends(get_client_edgedb)):
-    resp = await waifu_replace_custom_position(edgedb, id=id, **body.dict())
+    resp = await waifu_replace_custom_position(edgedb, id=id, **body.model_dump())
     if resp is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return resp
@@ -1043,7 +1043,7 @@ async def trade_index(edgedb: AsyncIOClient = Depends(get_client_edgedb)):
                                       status_code=status.HTTP_201_CREATED)
 async def new_trade(body: NewTradeBody,
                     edgedb: AsyncIOClient = Depends(get_client_edgedb)):
-    return await trade_insert(edgedb, **body.dict())
+    return await trade_insert(edgedb, **body.model_dump())
 
 
 @router.oauth2_client_restricted.post(
@@ -1147,7 +1147,7 @@ async def new_collection(body: NewCollectionBody,
     async for tx in edgedb.transaction():
         async with tx:
             try:
-                resp = await collection_insert(tx, **body.dict())
+                resp = await collection_insert(tx, **body.model_dump())
             except ConstraintViolationError as e:
                 raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                                     detail=str(e))

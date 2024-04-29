@@ -26,4 +26,4 @@ async def get_pot(discord_id: int,
 async def collect_pot(discord_id: int,
                       body: CollectPotBody,
                       edgedb: AsyncIOClient = Depends(get_client_edgedb)):
-    return await pot_add(edgedb, discord_id=discord_id, **body.dict())
+    return await pot_add(edgedb, discord_id=discord_id, **body.model_dump())

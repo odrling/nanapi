@@ -31,7 +31,7 @@ async def get_reminders(edgedb: AsyncIOClient = Depends(get_client_edgedb)):
                                       status_code=status.HTTP_201_CREATED)
 async def new_reminder(body: NewReminderBody,
                        edgedb: AsyncIOClient = Depends(get_client_edgedb)):
-    return await reminder_insert_select(edgedb, **body.dict())
+    return await reminder_insert_select(edgedb, **body.model_dump())
 
 
 @router.oauth2_client_restricted.delete(

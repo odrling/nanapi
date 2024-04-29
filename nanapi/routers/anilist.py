@@ -64,7 +64,7 @@ async def upsert_account(discord_id: int, body: UpsertAnilistAccountBody):
     try:
         return await account_merge(get_edgedb(),
                                    discord_id=discord_id,
-                                   **body.dict())
+                                   **body.model_dump())
     except ConstraintViolationError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
 

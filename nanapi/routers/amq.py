@@ -22,7 +22,7 @@ async def get_accounts(username: str | None = None):
 async def upsert_account(discord_id: int, body: UpsertAMQAccountBody):
     return await account_merge(get_edgedb(),
                                discord_id=discord_id,
-                               **body.dict())
+                               **body.model_dump())
 
 
 @router.oauth2_client.get('/settings',
@@ -35,4 +35,4 @@ async def get_settings(edgedb: AsyncIOClient = Depends(get_client_edgedb)):
                                        response_model=list[SettingsMergeResult])
 async def update_settings(body: UpdateAMQSettingsBody,
                           edgedb: AsyncIOClient = Depends(get_client_edgedb)):
-    return await settings_merge(edgedb, **body.dict())
+    return await settings_merge(edgedb, **body.model_dump())

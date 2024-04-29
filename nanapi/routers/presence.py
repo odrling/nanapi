@@ -32,7 +32,7 @@ async def get_presences(edgedb: AsyncIOClient = Depends(get_client_edgedb)):
 async def new_presence(body: NewPresenceBody,
                        edgedb: AsyncIOClient = Depends(get_client_edgedb)):
     try:
-        return await presence_insert(edgedb, **body.dict())
+        return await presence_insert(edgedb, **body.model_dump())
     except ConstraintViolationError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
 

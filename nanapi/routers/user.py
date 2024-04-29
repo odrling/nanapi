@@ -20,7 +20,7 @@ async def discord_account_index():
 
 @router.oauth2.patch('/accounts', response_model=list[UserBulkMergeResult])
 async def upsert_discord_accounts(body: list[UpsertDiscordAccountBodyItem]):
-    return await user_bulk_merge(get_edgedb(), users=[i.dict() for i in body])
+    return await user_bulk_merge(get_edgedb(), users=[i.model_dump() for i in body])
 
 
 @router.oauth2.get('/profiles/search', response_model=list[ProfileSearchResult])
@@ -55,4 +55,4 @@ async def get_profile(discord_id: int):
 async def upsert_profile(discord_id: int, body: UpsertProfileBody):
     return await profile_merge_select(get_edgedb(),
                                       discord_id=discord_id,
-                                      **body.dict())
+                                      **body.model_dump())

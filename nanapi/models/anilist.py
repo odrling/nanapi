@@ -292,8 +292,8 @@ class ALStaffCharacterConnection(BaseModel):
     edges: list[ALStaffCharacterEdge]
 
 
-ALCharacterConnection.update_forward_refs()
-ALStaff.update_forward_refs()
+ALCharacterConnection.model_rebuild()
+ALStaff.model_rebuild()
 
 
 ##############
