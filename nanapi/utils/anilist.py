@@ -810,6 +810,9 @@ class Media(ALEntity[ALMedia]):
                          items: set['Media'],
                          page: int,
                          low_priority: bool = False) -> set['Media']:
+        medias_dict = {m.id: m for m in items}
+        found = set()
+
         query = """
         query ($idIn: [Int], $page: Int) {
             Page {
@@ -827,21 +830,23 @@ class Media(ALEntity[ALMedia]):
         """ % (media_fields if page == 1 else 'id', page_info, chara_fields)
         variables = dict(idIn=[media.id for media in items], page=page)
 
-        jsonData = await anilist_api(dict(query=query, variables=variables),
-                                     low_priority=low_priority)
-
-        medias_dict = {m.id: m for m in items}
-        found = set()
-        for mediaData in jsonData['data']['Page']['media']:
-            almedia = ALMedia.model_validate(mediaData)
-            media = medias_dict.pop(almedia.id)
-            media.feed_page(almedia)
-            found.add(media)
+        try:
+            jsonData = await anilist_api(
+                dict(query=query, variables=variables), low_priority=low_priority
+            )
+            for mediaData in jsonData['data']['Page']['media']:
+                almedia = ALMedia.model_validate(mediaData)
+                media = medias_dict.pop(almedia.id)
+                media.feed_page(almedia)
+                found.add(media)
+        except aiohttp.ClientResponseError as e:
+            if e.status == 500:
+                logger.exception(e)
+            else:
+                raise
 
         if len(medias_dict) > 0:
-            logger.warning(
-                f"Media.fetch_page: medias {list(medias_dict.keys())} not found"
-            )
+            logger.warning(f'Media.fetch_page: medias {list(medias_dict.keys())} not found')
             for m in medias_dict.values():
                 del m.multitons.medias[m.id]
 
@@ -949,6 +954,9 @@ class Chara(ALEntity[ALCharacter]):
                          items: set['Chara'],
                          page: int,
                          low_priority: bool = False) -> set['Chara']:
+        charas_dict = {c.id: c for c in items}
+        found = set()
+
         query = """
         query ($idIn: [Int], $page: Int) {
             Page {
@@ -973,21 +981,23 @@ class Chara(ALEntity[ALCharacter]):
                staff_fields)
         variables = dict(idIn=[chara.id for chara in items], page=page)
 
-        jsonData = await anilist_api(dict(query=query, variables=variables),
-                                     low_priority=low_priority)
-
-        charas_dict = {c.id: c for c in items}
-        found = set()
-        for charaData in jsonData['data']['Page']['characters']:
-            alchara = ALCharacter.model_validate(charaData)
-            chara = charas_dict.pop(alchara.id)
-            chara.feed_page(alchara)
-            found.add(chara)
+        try:
+            jsonData = await anilist_api(
+                dict(query=query, variables=variables), low_priority=low_priority
+            )
+            for charaData in jsonData['data']['Page']['characters']:
+                alchara = ALCharacter.model_validate(charaData)
+                chara = charas_dict.pop(alchara.id)
+                chara.feed_page(alchara)
+                found.add(chara)
+        except aiohttp.ClientResponseError as e:
+            if e.status == 500:
+                logger.exception(e)
+            else:
+                raise
 
         if len(charas_dict) > 0:
-            logger.warning(
-                f"Chara.fetch_page: Charas {list(charas_dict.keys())} not found"
-            )
+            logger.warning(f'Chara.fetch_page: Charas {list(charas_dict.keys())} not found')
             for c in charas_dict.values():
                 del c.multitons.charas[c.id]
 
@@ -1082,6 +1092,9 @@ class Staff(ALEntity[ALStaff]):
                          items: set['Staff'],
                          page: int,
                          low_priority: bool = False) -> set['Staff']:
+        staffs_dict = {s.id: s for s in items}
+        found = set()
+
         query = """
         query ($idIn: [Int], $page: Int) {
             Page {
@@ -1105,21 +1118,23 @@ class Staff(ALEntity[ALStaff]):
                media_fields)
         variables = dict(idIn=[staff.id for staff in items], page=page)
 
-        jsonData = await anilist_api(dict(query=query, variables=variables),
-                                     low_priority=low_priority)
-
-        staffs_dict = {s.id: s for s in items}
-        found = set()
-        for staffData in jsonData['data']['Page']['staff']:
-            alstaff = ALStaff.model_validate(staffData)
-            staff = staffs_dict.pop(alstaff.id)
-            staff.feed_page(alstaff)
-            found.add(staff)
+        try:
+            jsonData = await anilist_api(
+                dict(query=query, variables=variables), low_priority=low_priority
+            )
+            for staffData in jsonData['data']['Page']['staff']:
+                alstaff = ALStaff.model_validate(staffData)
+                staff = staffs_dict.pop(alstaff.id)
+                staff.feed_page(alstaff)
+                found.add(staff)
+        except aiohttp.ClientResponseError as e:
+            if e.status == 500:
+                logger.exception(e)
+            else:
+                raise
 
         if len(staffs_dict) > 0:
-            logger.warning(
-                f"Staff.fetch_page: Staffs {list(staffs_dict.keys())} not found"
-            )
+            logger.warning(f'Staff.fetch_page: Staffs {list(staffs_dict.keys())} not found')
             for s in staffs_dict.values():
                 del s.multitons.staffs[s.id]
 
