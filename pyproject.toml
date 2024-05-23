@@ -42,7 +42,7 @@ tzdata = "2024.1"
 pyjwt = "2.8.0"
 
 [tool.poetry.group.dev.dependencies]
-pyright = "1.1.362"
+pyright = "1.1.364"
 ruff = "0.4.4"
 edgedb-pydantic-codegen = "2024.5.2"
 uvicorn = { version = "0.29.0", extras = ["standard"] }
