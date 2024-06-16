@@ -102,12 +102,12 @@ class BaseRoll(abc.ABC):
     @abc.abstractmethod
     async def _roll(
         self, executor: AsyncIOExecutor, pool_discord_id: int
-    ) -> tuple[npt.NDArray[np.int_], npt.NDArray[np.float_]]:
+    ) -> tuple[npt.NDArray[np.int_], npt.NDArray[np.float64]]:
         pass
 
     async def _charas_probas_from_pool(
         self, pool: list[UserPoolResult] | list[MediasPoolResult]
-    ) -> tuple[npt.NDArray[np.int_], npt.NDArray[np.float_]]:
+    ) -> tuple[npt.NDArray[np.int_], npt.NDArray[np.float64]]:
         charas_ids = {
             RANKS[group.key.rank]: set(el.id_al for el in group.elements)
             for group in pool
@@ -144,7 +144,7 @@ class UserRoll(BaseRoll):
 
     async def _roll(
         self, executor: AsyncIOExecutor, pool_discord_id: int
-    ) -> tuple[npt.NDArray[np.int_], npt.NDArray[np.float_]]:
+    ) -> tuple[npt.NDArray[np.int_], npt.NDArray[np.float64]]:
         pool = await self._cached_user_pool(executor,
                                             discord_id=pool_discord_id)
         charas, probas = await self._charas_probas_from_pool(pool)
@@ -199,7 +199,7 @@ class BaseMediaRoll(BaseRoll, metaclass=abc.ABCMeta):
 
     async def _roll(
         self, executor: AsyncIOExecutor, pool_discord_id: int
-    ) -> tuple[npt.NDArray[np.int_], npt.NDArray[np.float_]]:
+    ) -> tuple[npt.NDArray[np.int_], npt.NDArray[np.float64]]:
         pool = await self.get_pool(executor, pool_discord_id)
         return await self._charas_probas_from_pool(pool)
 
