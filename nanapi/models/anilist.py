@@ -5,7 +5,6 @@ from typing import Any, Literal, Optional
 from pydantic import BaseModel
 
 from nanapi.database.anilist.account_merge import ACCOUNT_MERGE_SERVICE
-from nanapi.database.anilist.media_select import MediaSelectResult
 from nanapi.models.waicolle import RANKS, WaicolleRank
 
 
@@ -352,8 +351,3 @@ class StaffNameAutocompleteResult(BaseModel):
     id_al: int
     name_user_preferred: str
     name_native: str | None = None
-
-
-class RecommendationResult(BaseModel):
-    media: MediaSelectResult
-    score: float

@@ -1,6 +1,3 @@
-from typing import cast
-
-import polars as pl
 from edgedb.errors import ConstraintViolationError
 from fastapi import HTTPException, status
 from fastapi.responses import StreamingResponse
@@ -35,12 +32,10 @@ from nanapi.models.anilist import (
     MEDIA_TYPES,
     CharaNameAutocompleteResult,
     MediaTitleAutocompleteResult,
-    RecommendationResult,
     StaffNameAutocompleteResult,
     UpsertAnilistAccountBody,
 )
 from nanapi.settings import INSTANCE_NAME
-from nanapi.utils.anilist import predict_scores
 from nanapi.utils.clients import get_edgedb, get_meilisearch
 from nanapi.utils.collages import chara_collage, media_collage
 from nanapi.utils.fastapi import HTTPExceptionModel, NanAPIRouter
@@ -88,29 +83,6 @@ async def get_account_entries(discord_id: int,
     if resp is None:
         resp = []
     return resp
-
-
-@router.oauth2.get('/accounts/{discord_id}/recommendations',
-                   response_model=list[RecommendationResult])
-async def get_account_recommendations(discord_id: int):
-    p_scores, entries = await predict_scores()
-    user_entries = entries.filter(pl.col('discord_id') == discord_id)
-    if str(discord_id) not in p_scores:
-        return []
-    top_50 = (
-        p_scores
-        .filter(~pl.col('id_al').is_in(user_entries.select('id_al').to_series()))
-        .select(['id_al', str(discord_id)])
-        .sort(str(discord_id), descending=True)
-        .head(50)
-    )
-    ids_al = cast(list[int], top_50.select('id_al').to_series().to_list())
-    medias = await media_select(get_edgedb(), ids_al=ids_al)
-    medias_map = {m.id_al: m for m in medias}
-    return [
-        RecommendationResult(media=medias_map[id_al], score=score)
-        for id_al, score in top_50.rows()
-    ]
 
 
 ##########

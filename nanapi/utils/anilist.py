@@ -3,27 +3,19 @@ import logging
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from datetime import timedelta
 from itertools import count, filterfalse
 from typing import Any, Generator, Generic, Optional, Self, Type, TypeVar
 
 import aiohttp
-import numpy as np
 import orjson
-import polars as pl
-from asyncache import cached
-from cachetools import TTLCache
 from edgedb import AsyncIOExecutor
 from pydantic import TypeAdapter
-from sklearn import preprocessing
-from sklearn.decomposition import TruncatedSVD
 from toolz.curried import concat
 from toolz.itertoolz import partition_all
 
 from nanapi.database.anilist.c_edge_merge_combined_by_chara import c_edge_merge_combined_by_chara
 from nanapi.database.anilist.c_edge_merge_multiple import c_edge_merge_multiple
 from nanapi.database.anilist.chara_merge_multiple import chara_merge_multiple
-from nanapi.database.anilist.entry_select_all import entry_select_all
 from nanapi.database.anilist.media_merge_combined_charas import media_merge_combined_charas
 from nanapi.database.anilist.media_merge_multiple import media_merge_multiple
 from nanapi.database.anilist.media_select_all_ids import MediaSelectAllIdsResult
@@ -46,7 +38,7 @@ from nanapi.models.anilist import (
     MediaType,
 )
 from nanapi.settings import LOW_PRIORITY_THRESH, MAL_CLIENT_ID
-from nanapi.utils.clients import get_edgedb, get_session
+from nanapi.utils.clients import get_session
 from nanapi.utils.misc import default_backoff
 
 logger = logging.getLogger(__name__)
@@ -1183,72 +1175,3 @@ async def edgedb_split_merge(executor: AsyncIOExecutor, medias: list,
         await staff_merge_multiple(executor, staffs=part)
     for part in partition_all(MERGE_COMBINED_MAX_SIZE, edges):
         await c_edge_merge_multiple(executor, edges=part)
-
-
-async def get_entries_df():
-    entries_data = await entry_select_all(get_edgedb())
-    entries = pl.DataFrame([
-        dict(
-            status=e.status.value,
-            score=e.score,
-            id_al=e.media.id_al,
-            discord_id=e.account.user.discord_id,
-        ) for e in entries_data
-    ])
-    return entries
-
-
-def entries_to_scores_df(entries: pl.DataFrame) -> pl.DataFrame:
-    scores = entries.pivot('discord_id', index='id_al',
-                           values='score', aggregate_function='max')
-    return scores
-
-
-@cached(cache=TTLCache(1024, ttl=timedelta(hours=6).seconds))
-async def predict_scores() -> tuple[pl.DataFrame, pl.DataFrame]:
-    entries = await get_entries_df()
-
-    # Remove PLANNING entries
-    entries = entries.filter(pl.col('status') != 'PLANNING')
-
-    # Remove users without any scored entries (null std = useless data)
-    entries = entries.filter(pl.col('score').sum().over('discord_id') > 0)
-
-    # Fill missing scores
-    entries = entries.with_columns(
-        pl.when(pl.col('score') > 0)
-        .then(pl.col('score'))  # Nothing to do
-        .when(pl.col('status') == 'CURRENT')
-        .then(pl.col('score').filter(pl.col('score') > 0).quantile(0.50).over('discord_id'))
-        .when(pl.col('status') == 'COMPLETED')
-        .then(pl.col('score').filter(pl.col('score') > 0).quantile(0.25).over('discord_id'))
-        .when(pl.col('status') == 'PAUSED')
-        .then(pl.col('score').filter(pl.col('score') > 0).quantile(0.25).over('discord_id'))
-        .when(pl.col('status') == 'DROPPED')
-        .then(0)
-        .when(pl.col('status') == 'REPEATING')
-        .then(pl.col('score').filter(pl.col('score') > 0).quantile(0.75).over('discord_id'))
-        .otherwise(pl.col('score'))  # Should not happen
-        .alias('score')
-    )
-
-    scores = entries_to_scores_df(entries)
-    scores_np = scores.select(pl.all().exclude('id_al')).to_numpy()
-
-    # Standardize
-    scaler = preprocessing.StandardScaler()
-    std_scores = scaler.fit_transform(scores_np)
-
-    # SVD
-    svd = TruncatedSVD(n_components=2)
-    decomp = svd.fit_transform(np.nan_to_num(std_scores))
-
-    # Reconstruct
-    p_scores_np = svd.inverse_transform(decomp)
-    p_scores_np = scaler.inverse_transform(p_scores_np)
-    p_scores = pl.concat(
-        (scores.select('id_al'),
-         pl.DataFrame(p_scores_np, schema=scores.columns[1:])),
-        how='horizontal')
-
-    return p_scores, entries
