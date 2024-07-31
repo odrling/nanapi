@@ -4,6 +4,7 @@ import aiohttp
 import edgedb
 import meilisearch_python_sdk
 import orjson
+from meilisearch_python_sdk.json_handler import OrjsonHandler
 from toolz.curried import memoize
 
 from nanapi.settings import EDGEDB_CONFIG, MEILISEARCH_CONFIG, MEILISEARCH_HOST_URL
@@ -23,6 +24,7 @@ def _get_edgedb() -> edgedb.AsyncIOClient:
 
 def get_meilisearch() -> meilisearch_python_sdk.AsyncClient:
     client = meilisearch_python_sdk.AsyncClient(MEILISEARCH_HOST_URL,
+                                                json_handler=OrjsonHandler(),
                                                 **MEILISEARCH_CONFIG)
     return client
 
