@@ -713,13 +713,13 @@ test = ["flake8 (>=7.0.0,<7.1.0)", "flake8-bugbear (>=24.4.26,<24.5.0)", "pycode
 
 [[package]]
 name = "edgedb-pydantic-codegen"
-version = "2024.8.2"
+version = "2024.8.3"
 description = "Alternative Python EdgeDB code generator (Pydantic V2 + asyncio, FastAPI compatible)"
 optional = false
 python-versions = "<4.0,>=3.11"
 files = [
-    {file = "edgedb_pydantic_codegen-2024.8.2-py3-none-any.whl", hash = "sha256:2197497a42fc26927440b976848c955946a10ee620e7124bbbc66f0dda7a9c89"},
-    {file = "edgedb_pydantic_codegen-2024.8.2.tar.gz", hash = "sha256:b014e6baf6340e03664923cc10d6d7f39b430ad71c78fa205fb49c54be1a86d4"},
+    {file = "edgedb_pydantic_codegen-2024.8.3-py3-none-any.whl", hash = "sha256:b53c94653559b9babf06a703c9b030df1910083dd02237c8a94ee73591e9c673"},
+    {file = "edgedb_pydantic_codegen-2024.8.3.tar.gz", hash = "sha256:17a22de5c7241180cb84582248f63761b10e5c39b85600f7ae1ea292aed87361"},
 ]
 
 [package.dependencies]
@@ -2552,4 +2552,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.12"
-content-hash = "93fe42b24fcd9ef25d200b42b91d43f3106cc530109e3e34820fb35cec1e6041"
+content-hash = "649fa82ff42eb979b1d2499afeabc7d4b84cb636ae976e3f8a22414c76dfc7ad"
