@@ -1045,6 +1045,7 @@ files = [
 
 [package.dependencies]
 certifi = "*"
+h2 = {version = ">=3,<5", optional = true, markers = "extra == \"http2\""}
 httpcore = ">=0.15.0,<0.17.0"
 rfc3986 = {version = ">=1.3,<2", extras = ["idna2008"]}
 sniffio = "*"
@@ -1223,19 +1224,19 @@ files = [
 
 [[package]]
 name = "meilisearch-python-sdk"
-version = "3.3.0"
+version = "3.4.0"
 description = "A Python client providing both async and sync support for the Meilisearch API"
 optional = false
 python-versions = ">=3.9"
 files = [
-    {file = "meilisearch_python_sdk-3.3.0-py3-none-any.whl", hash = "sha256:b2535e60978a6f7c7a88e49ac5fb7772cba32481de97c46e4e5656134fd67c61"},
-    {file = "meilisearch_python_sdk-3.3.0.tar.gz", hash = "sha256:7659c0a66c11f2f6d4b7e2b71e569b30c7decba8895b37b36f9fb5e07e08193f"},
+    {file = "meilisearch_python_sdk-3.4.0-py3-none-any.whl", hash = "sha256:c1329173b66f11c7661e40b69e3791b4337ff69ba187880badf84a809b418d40"},
+    {file = "meilisearch_python_sdk-3.4.0.tar.gz", hash = "sha256:0aabf133f313c2d4a31c3e9c5f270d08f62a4b7e995755b1bba9a414560fb702"},
 ]
 
 [package.dependencies]
 aiofiles = ">=0.7"
 camel-converter = ">=1.0.0"
-httpx = ">=0.17"
+httpx = {version = ">=0.17", extras = ["http2"]}
 pydantic = ">=2.0.0"
 pyjwt = ">=2.3.0"
 
@@ -2565,4 +2566,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.12"
-content-hash = "676fe73778df1dc5421d74ca4b5bd4ef2c09e0ae3a27b805f1604e96ef42a5ec"
+content-hash = "65bb04d57800b819d91a95692d94db3b9b9704b2d8a5469550410111ba858af9"
