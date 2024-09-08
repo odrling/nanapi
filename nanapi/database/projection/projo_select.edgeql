@@ -35,6 +35,7 @@ select filtered {
     title,
     @added,
   } order by @added,
+  participants: { * },
   events: {
     date,
     description,

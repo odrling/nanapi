@@ -33,7 +33,8 @@ from nanapi.database.calendar.user_calendar_select_all import (
     user_calendar_select_all,
 )
 from nanapi.database.default.client_get_by_username import client_get_by_username
-from nanapi.models.calendar import ParticipantAddBody, UpsertGuildEventBody, UpsertUserCalendarBody
+from nanapi.models.calendar import UpsertGuildEventBody, UpsertUserCalendarBody
+from nanapi.models.common import ParticipantAddBody
 from nanapi.utils.calendar import ics_from_events
 from nanapi.utils.clients import get_edgedb
 from nanapi.utils.fastapi import NanAPIRouter, get_client_edgedb
@@ -114,7 +115,7 @@ async def delete_guild_event(discord_id: int, edgedb: AsyncIOClient = Depends(ge
     response_model=GuildEventParticipantAddResult,
     responses={status.HTTP_204_NO_CONTENT: {}},
 )
-async def add_participant_to_guild_event(
+async def add_guild_event_participant(
     discord_id: int,
     body: ParticipantAddBody,
     edgedb: AsyncIOClient = Depends(get_client_edgedb),
@@ -130,7 +131,7 @@ async def add_participant_to_guild_event(
     response_model=GuildEventParticipantRemoveResult,
     responses={status.HTTP_204_NO_CONTENT: {}},
 )
-async def remove_participant_from_guild_event(
+async def remove_guild_event_participant(
     discord_id: int,
     participant_id: int,
     edgedb: AsyncIOClient = Depends(get_client_edgedb),

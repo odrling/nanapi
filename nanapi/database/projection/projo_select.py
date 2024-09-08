@@ -44,6 +44,7 @@ select filtered {
     title,
     @added,
   } order by @added,
+  participants: { * },
   events: {
     date,
     description,
@@ -68,6 +69,13 @@ class ProjoSelectResultEvents(BaseModel):
     description: str
 
 
+class ProjoSelectResultParticipants(BaseModel):
+    id: UUID
+    discord_id: int
+    discord_id_str: str
+    discord_username: str
+
+
 class ProjoSelectResultExternalMedias(BaseModel):
     id: UUID
     title: str
@@ -90,6 +98,7 @@ class ProjoSelectResult(BaseModel):
     channel_id_str: str
     medias: list[ProjoSelectResultMedias]
     external_medias: list[ProjoSelectResultExternalMedias]
+    participants: list[ProjoSelectResultParticipants]
     events: list[ProjoSelectResultEvents]
 
 

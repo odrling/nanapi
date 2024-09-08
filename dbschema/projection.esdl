@@ -26,6 +26,9 @@ module projection {
       }
       on target delete allow;
     }
+    multi link participants -> user::User {
+      on target delete allow;
+    }
     multi link events := .<projection[is Event];
   }
 

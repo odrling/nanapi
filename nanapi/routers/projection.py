@@ -15,6 +15,14 @@ from nanapi.database.projection.projo_delete_upcoming_events import (
     projo_delete_upcoming_events,
 )
 from nanapi.database.projection.projo_insert import ProjoInsertResult, projo_insert
+from nanapi.database.projection.projo_participant_add import (
+    ProjoParticipantAddResult,
+    projo_participant_add,
+)
+from nanapi.database.projection.projo_participant_remove import (
+    ProjoParticipantRemoveResult,
+    projo_participant_remove,
+)
 from nanapi.database.projection.projo_remove_external_media import (
     ProjoRemoveExternalMediaResult,
     projo_remove_external_media,
@@ -37,6 +45,7 @@ from nanapi.database.projection.projo_update_status import (
     ProjoUpdateStatusResult,
     projo_update_status,
 )
+from nanapi.models.common import ParticipantAddBody
 from nanapi.models.projection import (
     NewProjectionBody,
     NewProjectionEventBody,
@@ -197,6 +206,38 @@ async def remove_projection_external_media(
         edgedb: AsyncIOClient = Depends(get_client_edgedb)):
     resp = await projo_remove_external_media(
         edgedb, id=id, external_media_id=external_media_id)
+    if resp is None:
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return resp
+
+
+@router.oauth2_client_restricted.post(
+    '/{id}/participants',
+    response_model=ProjoParticipantAddResult,
+    responses={status.HTTP_204_NO_CONTENT: {}},
+)
+async def add_projection_participant(
+    id: UUID,
+    body: ParticipantAddBody,
+    edgedb: AsyncIOClient = Depends(get_client_edgedb),
+):
+    resp = await projo_participant_add(edgedb, id=id, **body.model_dump())
+    if resp is None:
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return resp
+
+
+@router.oauth2_client_restricted.delete(
+    '/{id}/participants/{participant_id}',
+    response_model=ProjoParticipantRemoveResult,
+    responses={status.HTTP_204_NO_CONTENT: {}},
+)
+async def remove_projection_participant(
+    id: UUID,
+    participant_id: int,
+    edgedb: AsyncIOClient = Depends(get_client_edgedb),
+):
+    resp = await projo_participant_remove(edgedb, id=id, participant_id=participant_id)
     if resp is None:
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     return resp

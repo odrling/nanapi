@@ -18,8 +18,3 @@ class UpsertGuildEventBody(BaseModel):
     url: str | None = None
     organizer_id: int
     organizer_username: str
-
-
-class ParticipantAddBody(BaseModel):
-    participant_id: int
-    participant_username: str
