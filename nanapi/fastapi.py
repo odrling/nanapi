@@ -13,6 +13,7 @@ from fastapi.routing import APIRoute
 from nanapi.routers import (
     amq,
     anilist,
+    calendar,
     client,
     histoire,
     pot,
@@ -59,6 +60,7 @@ if PROFILING:
 
 app.include_router(amq.router)
 app.include_router(anilist.router)
+app.include_router(calendar.router)
 app.include_router(client.router)
 app.include_router(histoire.router)
 app.include_router(pot.router)
