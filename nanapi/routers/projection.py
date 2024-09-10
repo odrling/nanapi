@@ -15,6 +15,14 @@ from nanapi.database.projection.projo_delete_upcoming_events import (
     projo_delete_upcoming_events,
 )
 from nanapi.database.projection.projo_insert import ProjoInsertResult, projo_insert
+from nanapi.database.projection.projo_participant_add import (
+    ProjoParticipantAddResult,
+    projo_participant_add,
+)
+from nanapi.database.projection.projo_participant_remove import (
+    ProjoParticipantRemoveResult,
+    projo_participant_remove,
+)
 from nanapi.database.projection.projo_remove_external_media import (
     ProjoRemoveExternalMediaResult,
     projo_remove_external_media,
@@ -37,9 +45,9 @@ from nanapi.database.projection.projo_update_status import (
     ProjoUpdateStatusResult,
     projo_update_status,
 )
+from nanapi.models.common import ParticipantAddBody
 from nanapi.models.projection import (
     NewProjectionBody,
-    NewProjectionEventBody,
     ProjoAddExternalMediaBody,
     SetProjectionMessageIdBody,
     SetProjectionNameBody,
@@ -202,23 +210,63 @@ async def remove_projection_external_media(
     return resp
 
 
-@router.oauth2_client_restricted.post(
-    '/{id}/events',
+@router.oauth2_client_restricted.put(
+    '/{id}/participants/{participant_id}',
+    response_model=ProjoParticipantAddResult,
+    responses={status.HTTP_204_NO_CONTENT: {}},
+)
+async def add_projection_participant(
+    id: UUID,
+    participant_id: int,
+    body: ParticipantAddBody,
+    edgedb: AsyncIOClient = Depends(get_client_edgedb),
+):
+    resp = await projo_participant_add(
+        edgedb,
+        id=id,
+        participant_id=participant_id,
+        **body.model_dump(),
+    )
+    if resp is None:
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return resp
+
+
+@router.oauth2_client_restricted.delete(
+    '/{id}/participants/{participant_id}',
+    response_model=ProjoParticipantRemoveResult,
+    responses={status.HTTP_204_NO_CONTENT: {}},
+)
+async def remove_projection_participant(
+    id: UUID,
+    participant_id: int,
+    edgedb: AsyncIOClient = Depends(get_client_edgedb),
+):
+    resp = await projo_participant_remove(edgedb, id=id, participant_id=participant_id)
+    if resp is None:
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
+    return resp
+
+
+@router.oauth2_client_restricted.put(
+    '/{id}/guild_events/{discord_id}',
     response_model=ProjoAddEventResult,
     status_code=status.HTTP_201_CREATED,
     responses={status.HTTP_404_NOT_FOUND: dict(model=HTTPExceptionModel)})
-async def new_projection_event(
+async def add_projection_guild_event(
         id: UUID,
-        body: NewProjectionEventBody,
+        discord_id: int,
         edgedb: AsyncIOClient = Depends(get_client_edgedb)):
-    resp = await projo_add_event(edgedb, id=id, **body.model_dump())
+    resp = await projo_add_event(edgedb, id=id, event_discord_id=discord_id)
     if resp is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return resp
 
 
 @router.oauth2_client_restricted.delete(
-    '/{id}/events', response_model=list[ProjoDeleteUpcomingEventsResult])
+    '/{id}/guild_events/upcoming',
+    response_model=ProjoDeleteUpcomingEventsResult,
+)
 async def delete_upcoming_projection_events(
         id: UUID,
         edgedb: AsyncIOClient = Depends(get_client_edgedb)):

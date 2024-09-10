@@ -27,13 +27,7 @@ with
     (select all_projos)
   )
 select filtered {
-  id,
-  name,
-  status,
-  message_id,
-  message_id_str,
-  channel_id,
-  channel_id_str,
+  *,
   medias: {
     id_al,
     title_user_preferred,
@@ -44,10 +38,8 @@ select filtered {
     title,
     @added,
   } order by @added,
-  events: {
-    date,
-    description,
-  }
+  participants: { * },
+  guild_events: { * },
 }
 """
 
@@ -63,9 +55,24 @@ class ProjectionStatus(StrEnum):
     COMPLETED = 'COMPLETED'
 
 
-class ProjoSelectResultEvents(BaseModel):
-    date: datetime
-    description: str
+class ProjoSelectResultGuildEvents(BaseModel):
+    id: UUID
+    discord_id: int
+    description: str | None
+    discord_id_str: str
+    end_time: datetime
+    image: str | None
+    location: str | None
+    name: str
+    start_time: datetime
+    url: str | None
+
+
+class ProjoSelectResultParticipants(BaseModel):
+    id: UUID
+    discord_id: int
+    discord_id_str: str
+    discord_username: str
 
 
 class ProjoSelectResultExternalMedias(BaseModel):
@@ -81,16 +88,17 @@ class ProjoSelectResultMedias(BaseModel):
 
 
 class ProjoSelectResult(BaseModel):
-    id: UUID
-    name: str
-    status: ProjectionStatus
-    message_id: int | None
-    message_id_str: str | None
-    channel_id: int
-    channel_id_str: str
     medias: list[ProjoSelectResultMedias]
     external_medias: list[ProjoSelectResultExternalMedias]
-    events: list[ProjoSelectResultEvents]
+    participants: list[ProjoSelectResultParticipants]
+    guild_events: list[ProjoSelectResultGuildEvents]
+    status: ProjectionStatus
+    name: str
+    message_id_str: str | None
+    message_id: int | None
+    channel_id_str: str
+    channel_id: int
+    id: UUID
 
 
 adapter = TypeAdapter(list[ProjoSelectResult])

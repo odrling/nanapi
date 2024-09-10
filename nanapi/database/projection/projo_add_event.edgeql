@@ -1,11 +1,12 @@
 with
   id := <uuid>$id,
-  date := <datetime>$date,
-  description := <str>$description,
-  projo := (select projection::Projection filter .id = id)
-insert projection::Event {
-  client := global client,
-  date := date,
-  description := description,
-  projection := projo
+  event_discord_id := <int64>$event_discord_id,
+  event := (
+    select calendar::GuildEvent
+    filter .client = global client and .discord_id = event_discord_id
+  ),
+update projection::Projection
+filter .id = id
+set {
+  guild_events += assert_exists(event)
 }

@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from pydantic import BaseModel
 
 from nanapi.database.projection.projo_update_status import PROJO_UPDATE_STATUS_STATUS
@@ -20,11 +18,6 @@ class SetProjectionStatusBody(BaseModel):
 
 class SetProjectionMessageIdBody(BaseModel):
     message_id: int
-
-
-class NewProjectionEventBody(BaseModel):
-    description: str
-    date: datetime
 
 
 class ProjoAddExternalMediaBody(BaseModel):

@@ -8,6 +8,8 @@ module user {
     link profile := .<user[is Profile];
     link amq := .<user[is amq::Account];
     link anilist := .<user[is anilist::Account];
+    link calendar := .<user[is calendar::UserCalendar];
+    multi link guild_events := .<participants[is calendar::GuildEvent];
     multi link pots := .<user[is pot::Pot];
     multi link quizzes := .<author[is quizz::Quizz];
     multi link reminders := .<user[is reminder::Reminder];

@@ -6,28 +6,31 @@ from pydantic import BaseModel, TypeAdapter
 EDGEQL_QUERY = r"""
 with
   id := <uuid>$id,
+  participant_id := <int64>$participant_id,
 update projection::Projection
 filter .id = id
 set {
-  guild_events -= (select .guild_events filter .start_time > datetime_of_transaction())
-}
+  participants -= (select user::User filter .discord_id = participant_id),
+};
 """
 
 
-class ProjoDeleteUpcomingEventsResult(BaseModel):
+class ProjoParticipantRemoveResult(BaseModel):
     id: UUID
 
 
-adapter = TypeAdapter(ProjoDeleteUpcomingEventsResult | None)
+adapter = TypeAdapter(ProjoParticipantRemoveResult | None)
 
 
-async def projo_delete_upcoming_events(
+async def projo_participant_remove(
     executor: AsyncIOExecutor,
     *,
     id: UUID,
-) -> ProjoDeleteUpcomingEventsResult | None:
+    participant_id: int,
+) -> ProjoParticipantRemoveResult | None:
     resp = await executor.query_single_json(
         EDGEQL_QUERY,
         id=id,
+        participant_id=participant_id,
     )
     return adapter.validate_json(resp, strict=False)
