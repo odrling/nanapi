@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from edgedb import AsyncIOClient
 from fastapi import Depends, HTTPException, Response, status
 
@@ -81,9 +83,10 @@ async def delete_user_calendar(discord_id: int):
     response_model=list[GuildEventSelectAllResult],
 )
 async def get_guild_events(
+    start_after: datetime | None = None,
     edgedb: AsyncIOClient = Depends(get_client_edgedb),
 ):
-    return await guild_event_select_all(edgedb)
+    return await guild_event_select_all(edgedb, start_after=start_after)
 
 
 @router.oauth2_client_restricted.put(
