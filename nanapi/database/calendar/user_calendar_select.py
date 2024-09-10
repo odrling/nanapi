@@ -5,9 +5,9 @@ from pydantic import BaseModel, TypeAdapter
 
 EDGEQL_QUERY = r"""
 with
-  discord_id := <int64>$discord_id
-select assert_single(calendar::UserCalendar) { ** }
-filter .user.discord_id = discord_id
+  discord_id := <int64>$discord_id,
+  calendar := (select calendar::UserCalendar filter .user.discord_id = discord_id),
+select assert_single(calendar) { ** }
 """
 
 
