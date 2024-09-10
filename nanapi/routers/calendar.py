@@ -13,11 +13,7 @@ from nanapi.database.calendar.guild_event_participant_remove import (
     GuildEventParticipantRemoveResult,
     guild_event_participant_remove,
 )
-from nanapi.database.calendar.guild_event_select_all import (
-    GuildEventSelectAllResult,
-    guild_event_select_all,
-)
-from nanapi.database.calendar.guild_event_select_participant import guild_event_select_participant
+from nanapi.database.calendar.guild_event_select import GuildEventSelectResult, guild_event_select
 from nanapi.database.calendar.user_calendar_delete import (
     UserCalendarDeleteResult,
     user_calendar_delete,
@@ -80,13 +76,13 @@ async def delete_user_calendar(discord_id: int):
 
 @router.oauth2_client.get(
     '/guild_events',
-    response_model=list[GuildEventSelectAllResult],
+    response_model=list[GuildEventSelectResult],
 )
 async def get_guild_events(
     start_after: datetime | None = None,
     edgedb: AsyncIOClient = Depends(get_client_edgedb),
 ):
-    return await guild_event_select_all(edgedb, start_after=start_after)
+    return await guild_event_select(edgedb, start_after=start_after)
 
 
 @router.oauth2_client_restricted.put(
@@ -156,11 +152,11 @@ async def remove_guild_event_participant(
 
 
 @router.basic_auth.get('/ics', responses={status.HTTP_404_NOT_FOUND: {}})
-async def get_ics(client: str, discord_id: int):
+async def get_ics(client: str, discord_id: int | None = None):
     _client = await client_get_by_username(get_edgedb(), username=client)
     if _client is None:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
     edgedb = get_client_edgedb(_client.id)
-    events = await guild_event_select_participant(edgedb, discord_id=discord_id)
+    events = await guild_event_select(edgedb, discord_id=discord_id)
     calendar = ics_from_events(events)
     return Response(content=calendar.serialize(), media_type='text/calendar')

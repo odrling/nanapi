@@ -7,10 +7,12 @@ from pydantic import BaseModel, TypeAdapter
 
 EDGEQL_QUERY = r"""
 with
-  discord_id := <int64>$discord_id,
+  discord_id := <optional int64>$discord_id,
+  start_after := <optional datetime>$start_after,
 select calendar::GuildEvent { ** }
 filter .client = global client
-and .participants.discord_id = discord_id
+and (.participants.discord_id = discord_id if exists discord_id else true)
+and (.start_time > start_after if exists start_after else true)
 """
 
 
@@ -19,7 +21,7 @@ class ProjectionStatus(StrEnum):
     COMPLETED = 'COMPLETED'
 
 
-class GuildEventSelectParticipantResultProjection(BaseModel):
+class GuildEventSelectResultProjection(BaseModel):
     id: UUID
     channel_id: int
     channel_id_str: str
@@ -29,27 +31,27 @@ class GuildEventSelectParticipantResultProjection(BaseModel):
     status: ProjectionStatus
 
 
-class GuildEventSelectParticipantResultOrganizer(BaseModel):
+class GuildEventSelectResultOrganizer(BaseModel):
     id: UUID
     discord_id: int
     discord_id_str: str
     discord_username: str
 
 
-class GuildEventSelectParticipantResultParticipants(BaseModel):
+class GuildEventSelectResultParticipants(BaseModel):
     id: UUID
     discord_id: int
     discord_id_str: str
     discord_username: str
 
 
-class GuildEventSelectParticipantResultClient(BaseModel):
+class GuildEventSelectResultClient(BaseModel):
     id: UUID
     password_hash: str
     username: str
 
 
-class GuildEventSelectParticipantResult(BaseModel):
+class GuildEventSelectResult(BaseModel):
     id: UUID
     discord_id: int
     description: str | None
@@ -60,22 +62,24 @@ class GuildEventSelectParticipantResult(BaseModel):
     name: str
     start_time: datetime
     url: str | None
-    client: GuildEventSelectParticipantResultClient
-    participants: list[GuildEventSelectParticipantResultParticipants]
-    organizer: GuildEventSelectParticipantResultOrganizer
-    projection: GuildEventSelectParticipantResultProjection | None
+    client: GuildEventSelectResultClient
+    participants: list[GuildEventSelectResultParticipants]
+    organizer: GuildEventSelectResultOrganizer
+    projection: GuildEventSelectResultProjection | None
 
 
-adapter = TypeAdapter(list[GuildEventSelectParticipantResult])
+adapter = TypeAdapter(list[GuildEventSelectResult])
 
 
-async def guild_event_select_participant(
+async def guild_event_select(
     executor: AsyncIOExecutor,
     *,
-    discord_id: int,
-) -> list[GuildEventSelectParticipantResult]:
+    discord_id: int | None = None,
+    start_after: datetime | None = None,
+) -> list[GuildEventSelectResult]:
     resp = await executor.query_json(
         EDGEQL_QUERY,
         discord_id=discord_id,
+        start_after=start_after,
     )
     return adapter.validate_json(resp, strict=False)

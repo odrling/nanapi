@@ -1,15 +1,13 @@
 import ics
 
-from nanapi.database.calendar.guild_event_select_participant import (
-    GuildEventSelectParticipantResult,
-)
+from nanapi.database.calendar.guild_event_select import GuildEventSelectResult
 
 
-def ics_from_events(events: list[GuildEventSelectParticipantResult]) -> ics.Calendar:
+def ics_from_events(events: list[GuildEventSelectResult]) -> ics.Calendar:
     return ics.Calendar(events=(to_ics_event(e) for e in events))
 
 
-def to_ics_event(event: GuildEventSelectParticipantResult) -> ics.Event:
+def to_ics_event(event: GuildEventSelectResult) -> ics.Event:
     ics_event = ics.Event(name=event.name, begin=event.start_time, end=event.end_time)
     if event.description:
         ics_event.description = event.description
