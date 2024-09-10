@@ -54,7 +54,7 @@ build-backend = "poetry.core.masonry.api"
 [tool.pyright]
 reportDeprecated = true
 ignore = [
-    "nanapi/database", # FIXME: https://github.com/microsoft/pyright/issues/7228
+    "nanapi/nanachan_v2_migrate.py",
 ]
 
 [tool.ruff]
