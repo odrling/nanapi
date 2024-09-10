@@ -151,7 +151,7 @@ async def remove_guild_event_participant(
     return resp
 
 
-@router.basic_auth.get('/ics', responses={status.HTTP_404_NOT_FOUND: {}})
+@router.public.get('/ics', responses={status.HTTP_404_NOT_FOUND: {}})
 async def get_ics(client: str, user: int | None = None):
     _client = await client_get_by_username(get_edgedb(), username=client)
     if _client is None:
