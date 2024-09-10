@@ -18,13 +18,7 @@ with
     (select all_projos)
   )
 select filtered {
-  id,
-  name,
-  status,
-  message_id,
-  message_id_str,
-  channel_id,
-  channel_id_str,
+  *,
   medias: {
     id_al,
     title_user_preferred,
@@ -36,8 +30,5 @@ select filtered {
     @added,
   } order by @added,
   participants: { * },
-  events: {
-    date,
-    description,
-  }
+  guild_events: { * },
 }

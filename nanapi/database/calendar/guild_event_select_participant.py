@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import StrEnum
 from uuid import UUID
 
 from edgedb import AsyncIOExecutor
@@ -7,21 +8,25 @@ from pydantic import BaseModel, TypeAdapter
 EDGEQL_QUERY = r"""
 with
   discord_id := <int64>$discord_id,
-select calendar::GuildEvent {
-  *,
-  organizer: { * },
-  participants: { * },
-}
+select calendar::GuildEvent { ** }
 filter .client = global client
 and .participants.discord_id = discord_id
 """
 
 
-class GuildEventSelectParticipantResultParticipants(BaseModel):
+class ProjectionStatus(StrEnum):
+    ONGOING = 'ONGOING'
+    COMPLETED = 'COMPLETED'
+
+
+class GuildEventSelectParticipantResultProjection(BaseModel):
     id: UUID
-    discord_id: int
-    discord_id_str: str
-    discord_username: str
+    channel_id: int
+    channel_id_str: str
+    message_id: int | None
+    message_id_str: str | None
+    name: str
+    status: ProjectionStatus
 
 
 class GuildEventSelectParticipantResultOrganizer(BaseModel):
@@ -31,9 +36,20 @@ class GuildEventSelectParticipantResultOrganizer(BaseModel):
     discord_username: str
 
 
+class GuildEventSelectParticipantResultParticipants(BaseModel):
+    id: UUID
+    discord_id: int
+    discord_id_str: str
+    discord_username: str
+
+
+class GuildEventSelectParticipantResultClient(BaseModel):
+    id: UUID
+    password_hash: str
+    username: str
+
+
 class GuildEventSelectParticipantResult(BaseModel):
-    organizer: GuildEventSelectParticipantResultOrganizer
-    participants: list[GuildEventSelectParticipantResultParticipants]
     id: UUID
     discord_id: int
     description: str | None
@@ -44,6 +60,10 @@ class GuildEventSelectParticipantResult(BaseModel):
     name: str
     start_time: datetime
     url: str | None
+    client: GuildEventSelectParticipantResultClient
+    participants: list[GuildEventSelectParticipantResultParticipants]
+    organizer: GuildEventSelectParticipantResultOrganizer
+    projection: GuildEventSelectParticipantResultProjection | None
 
 
 adapter = TypeAdapter(list[GuildEventSelectParticipantResult])

@@ -23,6 +23,7 @@ module calendar {
     multi link participants -> user::User {
       on target delete allow;
     }
+    link projection := .<guild_events[is projection::Projection];
     constraint exclusive on ((.client, .discord_id));
   }
 }

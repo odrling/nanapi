@@ -21,28 +21,31 @@ with
       }
     )
   ),
-insert calendar::GuildEvent {
-  client := global client,
-  discord_id := discord_id,
-  name := name,
-  description := description,
-  location := location,
-  start_time := start_time,
-  end_time := end_time,
-  image := image,
-  url := url,
-  organizer := organizer,
-}
-unless conflict on ((.client, .discord_id))
-else (
-  update calendar::GuildEvent set {
-    name := name,
-    description := description,
-    location := location,
-    start_time := start_time,
-    end_time := end_time,
-    image := image,
-    url := url,
-    organizer := organizer,
-  }
-)
+  event := (
+    insert calendar::GuildEvent {
+      client := global client,
+      discord_id := discord_id,
+      name := name,
+      description := description,
+      location := location,
+      start_time := start_time,
+      end_time := end_time,
+      image := image,
+      url := url,
+      organizer := organizer,
+    }
+    unless conflict on ((.client, .discord_id))
+    else (
+      update calendar::GuildEvent set {
+        name := name,
+        description := description,
+        location := location,
+        start_time := start_time,
+        end_time := end_time,
+        image := image,
+        url := url,
+        organizer := organizer,
+      }
+    )
+  ),
+select assert_exists(event) { ** }

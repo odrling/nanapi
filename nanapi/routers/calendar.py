@@ -69,12 +69,12 @@ async def upsert_user_calendar(discord_id: int, body: UpsertUserCalendarBody):
 @router.oauth2.delete(
     '/user_calendars/{discord_id}',
     response_model=UserCalendarDeleteResult,
-    responses={status.HTTP_204_NO_CONTENT: {}},
+    responses={status.HTTP_404_NOT_FOUND: {}},
 )
 async def delete_user_calendar(discord_id: int):
     resp = await user_calendar_delete(get_edgedb(), discord_id=discord_id)
     if resp is None:
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
     return resp
 
 
@@ -104,35 +104,41 @@ async def upsert_guild_event(
 @router.oauth2_client_restricted.delete(
     '/guild_events/{discord_id}',
     response_model=GuildEventDeleteResult,
-    responses={status.HTTP_204_NO_CONTENT: {}},
+    responses={status.HTTP_404_NOT_FOUND: {}},
 )
 async def delete_guild_event(discord_id: int, edgedb: AsyncIOClient = Depends(get_client_edgedb)):
     resp = await guild_event_delete(edgedb, discord_id=discord_id)
     if resp is None:
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
     return resp
 
 
-@router.oauth2_client_restricted.post(
-    '/guild_events/{discord_id}/participants',
+@router.oauth2_client_restricted.put(
+    '/guild_events/{discord_id}/participants/{participant_id}',
     response_model=GuildEventParticipantAddResult,
-    responses={status.HTTP_204_NO_CONTENT: {}},
+    responses={status.HTTP_404_NOT_FOUND: {}},
 )
 async def add_guild_event_participant(
     discord_id: int,
+    participant_id: int,
     body: ParticipantAddBody,
     edgedb: AsyncIOClient = Depends(get_client_edgedb),
 ):
-    resp = await guild_event_participant_add(edgedb, discord_id=discord_id, **body.model_dump())
+    resp = await guild_event_participant_add(
+        edgedb,
+        discord_id=discord_id,
+        participant_id=participant_id,
+        **body.model_dump(),
+    )
     if resp is None:
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
     return resp
 
 
 @router.oauth2_client_restricted.delete(
     '/guild_events/{discord_id}/participants/{participant_id}',
     response_model=GuildEventParticipantRemoveResult,
-    responses={status.HTTP_204_NO_CONTENT: {}},
+    responses={status.HTTP_404_NOT_FOUND: {}},
 )
 async def remove_guild_event_participant(
     discord_id: int,
@@ -145,7 +151,7 @@ async def remove_guild_event_participant(
         participant_id=participant_id,
     )
     if resp is None:
-        return Response(status_code=status.HTTP_204_NO_CONTENT)
+        return Response(status_code=status.HTTP_404_NOT_FOUND)
     return resp
 
 

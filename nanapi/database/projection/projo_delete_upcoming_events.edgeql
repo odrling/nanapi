@@ -1,5 +1,7 @@
 with
   id := <uuid>$id,
-  projo := (select projection::Projection filter .id = id)
-delete projection::Event
-filter .projection = projo and .date > datetime_current()
+update projection::Projection
+filter .id = id
+set {
+  guild_events -= (select .guild_events filter .start_time > datetime_of_transaction())
+}

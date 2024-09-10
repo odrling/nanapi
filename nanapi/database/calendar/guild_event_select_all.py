@@ -1,4 +1,5 @@
 from datetime import datetime
+from enum import StrEnum
 from uuid import UUID
 
 from edgedb import AsyncIOExecutor
@@ -7,21 +8,25 @@ from pydantic import BaseModel, TypeAdapter
 EDGEQL_QUERY = r"""
 with
   start_after := <optional datetime>$start_after,
-select calendar::GuildEvent {
-  *,
-  organizer: { * },
-  participants: { * },
-}
+select calendar::GuildEvent { ** }
 filter .client = global client
 and (.start_time > start_after if exists start_after else true)
 """
 
 
-class GuildEventSelectAllResultParticipants(BaseModel):
+class ProjectionStatus(StrEnum):
+    ONGOING = 'ONGOING'
+    COMPLETED = 'COMPLETED'
+
+
+class GuildEventSelectAllResultProjection(BaseModel):
     id: UUID
-    discord_id: int
-    discord_id_str: str
-    discord_username: str
+    channel_id: int
+    channel_id_str: str
+    message_id: int | None
+    message_id_str: str | None
+    name: str
+    status: ProjectionStatus
 
 
 class GuildEventSelectAllResultOrganizer(BaseModel):
@@ -31,9 +36,20 @@ class GuildEventSelectAllResultOrganizer(BaseModel):
     discord_username: str
 
 
+class GuildEventSelectAllResultParticipants(BaseModel):
+    id: UUID
+    discord_id: int
+    discord_id_str: str
+    discord_username: str
+
+
+class GuildEventSelectAllResultClient(BaseModel):
+    id: UUID
+    password_hash: str
+    username: str
+
+
 class GuildEventSelectAllResult(BaseModel):
-    organizer: GuildEventSelectAllResultOrganizer
-    participants: list[GuildEventSelectAllResultParticipants]
     id: UUID
     discord_id: int
     description: str | None
@@ -44,6 +60,10 @@ class GuildEventSelectAllResult(BaseModel):
     name: str
     start_time: datetime
     url: str | None
+    client: GuildEventSelectAllResultClient
+    participants: list[GuildEventSelectAllResultParticipants]
+    organizer: GuildEventSelectAllResultOrganizer
+    projection: GuildEventSelectAllResultProjection | None
 
 
 adapter = TypeAdapter(list[GuildEventSelectAllResult])

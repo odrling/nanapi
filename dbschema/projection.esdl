@@ -29,14 +29,18 @@ module projection {
     multi link participants -> user::User {
       on target delete allow;
     }
-    multi link events := .<projection[is Event];
+    multi link guild_events -> calendar::GuildEvent {
+      constraint exclusive;
+      on target delete allow;
+    }
+    multi link legacy_events := .<projection[is LegacyEvent];
   }
 
   type ExternalMedia extending default::ClientObject {
     required property title -> str;
   }
 
-  type Event extending default::ClientObject {
+  type LegacyEvent extending default::ClientObject {
     required property date -> datetime;
     required property description -> str;
     required link projection -> Projection {

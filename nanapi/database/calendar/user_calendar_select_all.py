@@ -4,10 +4,7 @@ from edgedb import AsyncIOExecutor
 from pydantic import BaseModel, TypeAdapter
 
 EDGEQL_QUERY = r"""
-select calendar::UserCalendar {
-  ics,
-  user: { * },
-}
+select calendar::UserCalendar { ** }
 """
 
 
@@ -19,6 +16,7 @@ class UserCalendarSelectAllResultUser(BaseModel):
 
 
 class UserCalendarSelectAllResult(BaseModel):
+    id: UUID
     ics: str
     user: UserCalendarSelectAllResultUser
 

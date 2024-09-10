@@ -6,10 +6,7 @@ from pydantic import BaseModel, TypeAdapter
 EDGEQL_QUERY = r"""
 with
   discord_id := <int64>$discord_id
-select assert_single(calendar::UserCalendar) {
-  ics,
-  user: { * },
-}
+select assert_single(calendar::UserCalendar) { ** }
 filter .user.discord_id = discord_id
 """
 
@@ -22,6 +19,7 @@ class UserCalendarSelectResultUser(BaseModel):
 
 
 class UserCalendarSelectResult(BaseModel):
+    id: UUID
     ics: str
     user: UserCalendarSelectResultUser
 

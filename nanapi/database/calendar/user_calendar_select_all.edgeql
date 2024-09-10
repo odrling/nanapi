@@ -1,4 +1,1 @@
-select calendar::UserCalendar {
-  ics,
-  user: { * },
-}
+select calendar::UserCalendar { ** }
