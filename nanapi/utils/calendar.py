@@ -12,8 +12,9 @@ async def ics_from_events(
     calendar = ics.Calendar(events=(to_ics_event(e) for e in events))
     if user_calendar:
         ics_url = user_calendar.ics.replace('webcal://', 'https://')
-        async with get_session().get(ics_url) as req:
-            ics_str = await req.text()
+        async with get_session().get(ics_url) as resp:
+            resp.raise_for_status()
+            ics_str = await resp.text()
         user_cal = ics.Calendar(ics_str)
         calendar.events.update(user_cal.events)
     return calendar
