@@ -152,11 +152,18 @@ async def remove_guild_event_participant(
 
 
 @router.public.get('/ics', responses={status.HTTP_404_NOT_FOUND: {}})
-async def get_ics(client: str, user: int | None = None):
+async def get_ics(client: str, user: int | None = None, aggregate: bool = False):
     _client = await client_get_by_username(get_edgedb(), username=client)
     if _client is None:
         return Response(status_code=status.HTTP_404_NOT_FOUND)
     edgedb = get_client_edgedb(_client.id)
+
     events = await guild_event_select(edgedb, discord_id=user)
-    calendar = ics_from_events(events)
+
+    user_calendar = None
+    if user is not None and aggregate:
+        user_calendar = await user_calendar_select(get_edgedb(), discord_id=user)
+
+    calendar = await ics_from_events(events, user_calendar)
+
     return Response(content=calendar.serialize(), media_type='text/calendar')

@@ -1,10 +1,22 @@
 import ics
 
 from nanapi.database.calendar.guild_event_select import GuildEventSelectResult
+from nanapi.database.calendar.user_calendar_select import UserCalendarSelectResult
+from nanapi.utils.clients import get_session
 
 
-def ics_from_events(events: list[GuildEventSelectResult]) -> ics.Calendar:
-    return ics.Calendar(events=(to_ics_event(e) for e in events))
+async def ics_from_events(
+    events: list[GuildEventSelectResult],
+    user_calendar: UserCalendarSelectResult | None = None,
+) -> ics.Calendar:
+    calendar = ics.Calendar(events=(to_ics_event(e) for e in events))
+    if user_calendar:
+        ics_url = user_calendar.ics.replace('webcal://', 'https://')
+        async with get_session().get(ics_url) as req:
+            ics_str = await req.text()
+        user_cal = ics.Calendar(ics_str)
+        calendar.events.update(user_cal.events)
+    return calendar
 
 
 def to_ics_event(event: GuildEventSelectResult) -> ics.Event:
