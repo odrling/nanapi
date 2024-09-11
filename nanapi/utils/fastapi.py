@@ -1,4 +1,4 @@
-from functools import cached_property
+from functools import cache, cached_property
 from typing import Self, cast, override
 from uuid import UUID
 
@@ -9,7 +9,6 @@ from fastapi.responses import HTMLResponse
 from pydantic import BaseModel
 from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
 from starlette.requests import Request
-from toolz.curried import memoize
 
 from nanapi.database.default.client_get_by_username import (
     ClientGetByUsernameResult,
@@ -161,7 +160,7 @@ async def check_restricted_access(
             detail='client_id does not match the current client')
 
 
-@memoize
+@cache
 def get_client_edgedb(client_id: UUID = Depends(client_id_param)) -> edgedb.AsyncIOClient:
     client = get_edgedb().with_globals(client_id=client_id)
     return cast(edgedb.AsyncIOClient, client)

@@ -1,11 +1,11 @@
 import asyncio
 import sys
+from functools import cache
 from typing import Any
 
 from discord_webhook import AsyncDiscordWebhook
 from rich import traceback
 from rich.console import Console
-from toolz.curried import memoize
 
 from nanapi.settings import ERROR_WEBHOOK_URL, INSTANCE_NAME
 
@@ -26,7 +26,7 @@ def get_traceback_exc() -> traceback.Traceback:
         **TRACEBACK_KWARGS)
 
 
-@memoize
+@cache
 def get_console() -> Console:
     return Console(width=78)
 

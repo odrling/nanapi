@@ -1,3 +1,4 @@
+from functools import cache
 from typing import cast
 
 import aiohttp
@@ -5,12 +6,11 @@ import edgedb
 import meilisearch_python_sdk
 import orjson
 from meilisearch_python_sdk.json_handler import OrjsonHandler
-from toolz.curried import memoize
 
 from nanapi.settings import EDGEDB_CONFIG, MEILISEARCH_CONFIG, MEILISEARCH_HOST_URL
 
 
-@memoize
+@cache
 def get_edgedb() -> edgedb.AsyncIOClient:
     return _get_edgedb()
 
@@ -29,7 +29,7 @@ def get_meilisearch() -> meilisearch_python_sdk.AsyncClient:
     return client
 
 
-@memoize
+@cache
 def get_session() -> aiohttp.ClientSession:
     timeout = aiohttp.ClientTimeout(total=30, connect=5, sock_connect=5)
     # until they fix https://github.com/aio-libs/aiohttp/issues/5975
