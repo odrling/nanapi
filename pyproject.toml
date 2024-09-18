@@ -41,7 +41,7 @@ pyjwt = "2.9.0"
 ics = "0.7.2"
 
 [tool.poetry.group.dev.dependencies]
-pyright = "1.1.380"
+pyright = "1.1.381"
 ruff = "0.6.5"
 edgedb-pydantic-codegen = "2024.9.1"
 uvicorn = { version = "0.30.6", extras = ["standard"] }
