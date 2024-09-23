@@ -18,7 +18,6 @@ nanapi = "nanapi.__main__:main"
 python = "~3.12"
 edgedb = "2.0.1"
 fastapi = "0.115.0"
-uvloop = "0.20.0"
 pydantic = "2.9.2"
 aiohttp = { version = "3.10.5", extras = ["speedups"] }
 # https://github.com/PyYoshi/cChardet/issues/81
@@ -44,7 +43,6 @@ ics = "0.7.2"
 pyright = "1.1.381"
 ruff = "0.6.7"
 edgedb-pydantic-codegen = "2024.9.2"
-uvicorn = { version = "0.30.6", extras = ["standard"] }
 pyinstrument = "4.7.3"
 
 [build-system]
