@@ -19,7 +19,7 @@ python = "~3.12"
 edgedb = "2.0.1"
 fastapi = "0.115.0"
 pydantic = "2.9.2"
-aiohttp = { version = "3.10.5", extras = ["speedups"] }
+aiohttp = { version = "3.10.6", extras = ["speedups"] }
 # https://github.com/PyYoshi/cChardet/issues/81
 faust-cchardet = "2.1.19"
 orjson = "3.10.7"
