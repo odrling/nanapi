@@ -41,7 +41,7 @@ ics = "0.7.2"
 
 [tool.poetry.group.dev.dependencies]
 pyright = "1.1.382.post0"
-ruff = "0.6.7"
+ruff = "0.6.8"
 edgedb-pydantic-codegen = "2024.9.2"
 pyinstrument = "4.7.3"
 uvicorn = "0.30.6"
