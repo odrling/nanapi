@@ -1,6 +1,5 @@
 {
   "editor.rulers": [99],
-  "python.analysis.typeCheckingMode": "basic",
   "[edgeql]": {
     "editor.tabSize": 2
   },
