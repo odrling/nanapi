@@ -7,7 +7,11 @@
       "label": "edgedb_pydantic_codegen",
       "type": "shell",
       "command": "poetry run edgedb-pydantic-codegen nanapi/database/",
-      "group": "build"
+      "problemMatcher": "$python",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
     }
   ]
 }
