@@ -1,7 +1,6 @@
 import asyncio
 import logging
-
-from toolz.itertoolz import partition_all
+from itertools import batched
 
 from nanapi.database.anilist.chara_select_all_ids import chara_select_all_ids
 from nanapi.database.anilist.media_select_all_ids import media_select_all_ids
@@ -34,7 +33,7 @@ async def refresh_medias():
     if len(orphan_medias) == 0:
         return
 
-    parts = list(partition_all(50, orphan_medias))
+    parts = list(batched(orphan_medias, 50))
     logger.info(
         f"refresh_medias: fetching page 1 for {len(orphan_medias)} orphans medias "
         f"in {len(parts)} requests")

@@ -3,7 +3,7 @@ import logging
 import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from itertools import count, filterfalse
+from itertools import batched, count, filterfalse
 from typing import Any, Generator, Generic, Optional, Self, Type, TypeVar
 
 import aiohttp
@@ -11,7 +11,6 @@ import orjson
 from edgedb import AsyncIOExecutor
 from pydantic import TypeAdapter
 from toolz.curried import concat
-from toolz.itertoolz import partition_all
 
 from nanapi.database.anilist.c_edge_merge_combined_by_chara import c_edge_merge_combined_by_chara
 from nanapi.database.anilist.c_edge_merge_multiple import c_edge_merge_multiple
@@ -526,7 +525,7 @@ class MALUserlist(Userlist):
                 }
             }
             """ % (media_fields, page_info, chara_fields)
-            for sub_to_fetch in partition_all(50, to_fetch):
+            for sub_to_fetch in batched(to_fetch, 50):
                 variables = {
                     'idMal_in': sub_to_fetch,
                     'type': media_type,
@@ -860,7 +859,7 @@ class Media(ALEntity[ALMedia]):
             if len(not_complete) == 0:
                 return
 
-            parts = list(partition_all(50, not_complete))
+            parts = list(batched(not_complete, 50))
             logger.info(
                 f"Media.load: fetching page {page} for {len(not_complete)} medias "
                 f"in {len(parts)} requests")
@@ -1011,7 +1010,7 @@ class Chara(ALEntity[ALCharacter]):
             if len(not_complete) == 0:
                 return
 
-            parts = list(partition_all(50, not_complete))
+            parts = list(batched(not_complete, 50))
             logger.info(
                 f"Chara.load: fetching page {page} for {len(not_complete)} charas "
                 f"in {len(parts)} requests")
@@ -1148,7 +1147,7 @@ class Staff(ALEntity[ALStaff]):
             if len(not_complete) == 0:
                 return
 
-            parts = list(partition_all(50, not_complete))
+            parts = list(batched(not_complete, 50))
             logger.info(
                 f"Staff.load: fetching page {page} for {len(not_complete)} staffs "
                 f"in {len(parts)} requests")
@@ -1167,11 +1166,11 @@ class Staff(ALEntity[ALStaff]):
 
 async def edgedb_split_merge(executor: AsyncIOExecutor, medias: list,
                              characters: list, staffs: list, edges: list):
-    for part in partition_all(MERGE_COMBINED_MAX_SIZE, medias):
+    for part in batched(medias, MERGE_COMBINED_MAX_SIZE):
         await media_merge_multiple(executor, medias=part)
-    for part in partition_all(MERGE_COMBINED_MAX_SIZE, characters):
+    for part in batched(characters, MERGE_COMBINED_MAX_SIZE):
         await chara_merge_multiple(executor, characters=part)
-    for part in partition_all(MERGE_COMBINED_MAX_SIZE, staffs):
+    for part in batched(staffs, MERGE_COMBINED_MAX_SIZE):
         await staff_merge_multiple(executor, staffs=part)
-    for part in partition_all(MERGE_COMBINED_MAX_SIZE, edges):
+    for part in batched(edges, MERGE_COMBINED_MAX_SIZE):
         await c_edge_merge_multiple(executor, edges=part)
