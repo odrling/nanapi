@@ -4,6 +4,7 @@
 
 ```sh
 git clone https://github.com/Japan7/nanapi.git
+cd nanapi/
 ```
 
 ## Setup EdgeDB
@@ -13,7 +14,6 @@ Follow the installation guide: https://www.edgedb.com/install
 Launch and link an instance to the project:
 
 ```sh
-cd nanapi/
 edgedb project init
 ```
 
@@ -25,16 +25,10 @@ Web UI: `edgedb ui`
 docker run -d --name meilisearch -p 7700:7700 getmeili/meilisearch:latest
 ```
 
-## Install and launch nanapi
+## Launch nanapi
 
 ```sh
-poetry install
-poetry shell
-python -m nanapi
+uv run --frozen -m nanapi
 ```
 
 API docs: http://127.0.0.1/docs or http://127.0.0.1/redoc
-
-## Dev Container
-
-Dev Container config is also provided for VS Code.

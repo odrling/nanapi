@@ -28,22 +28,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/cache@v4
+      - uses: astral-sh/setup-uv@v3
         with:
-          path: ~/.cache/pypoetry
-          key: ${{ runner.os }}-poetry-${{ hashFiles('**/pyproject.toml', '**/poetry.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-poetry-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: poetry install
-        run: |
-          pip3 install poetry
-          poetry install
-          cp nanapi/example.local_settings.py nanapi/local_settings.py
-      - run: poetry run pyright
-      - run: poetry run ruff check nanapi/
+          enable-cache: true
+      - run: cp nanapi/example.local_settings.py nanapi/local_settings.py
+      - run: uv run --frozen pyright
+      - run: uv run --frozen ruff check nanapi/
         if: always()
       - uses: sarisia/actions-status-discord@v1
         if: failure()
