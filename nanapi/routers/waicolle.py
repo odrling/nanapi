@@ -1102,6 +1102,8 @@ async def commit_trade(id: UUID,
             trade = await trade_get_by_id(tx, id=id)
             if trade is None:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+            delete = await trade_delete(tx, id=id)
+            assert delete is not None
 
             try:
                 await player_add_coins(
@@ -1126,9 +1128,6 @@ async def commit_trade(id: UUID,
                 tx,
                 discord_id=trade.player_b.user.discord_id,
                 ids=[w.id for w in trade.waifus_a])
-
-            delete = await trade_delete(tx, id=id)
-            assert delete is not None
 
             return dict(waifus_a=resp3, waifus_b=resp4)
 
