@@ -9,7 +9,7 @@ dependencies = [
     "edgedb==2.1.0",
     "fastapi==0.115.0",
     "pydantic==2.9.2",
-    "aiohttp[speedups]==3.10.9",
+    "aiohttp[speedups]==3.10.10",
     "faust-cchardet==2.1.19",        # https://github.com/PyYoshi/cChardet/issues/81
     "orjson==3.10.7",
     "toolz==1.0.0",
