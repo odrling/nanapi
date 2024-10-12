@@ -342,7 +342,7 @@ wheels = [
 
 [[package]]
 name = "edgedb-pydantic-codegen"
-version = "2024.10.0"
+version = "2024.10.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "edgedb" },
@@ -351,9 +351,9 @@ dependencies = [
     { name = "pydantic" },
     { name = "ruff" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/2b/f8/22fa6a50534338e61b441e3aab1624826a8405b4b00c22746135ab3495cd/edgedb_pydantic_codegen-2024.10.0.tar.gz", hash = "sha256:16b554854cdf6ba61ed02b64558c77022ebf9601df7a23eb2f96a60e6fa42943", size = 7787 }
+sdist = { url = "https://files.pythonhosted.org/packages/ed/b9/5952349b2d9909a3e92e9cd50921b17cff18ae99d8929c00e20dc86d301b/edgedb_pydantic_codegen-2024.10.4.tar.gz", hash = "sha256:052cbf69435c0ad1b9247c14c5de3c3330f27abeb21687c4a127998f9ee9398d", size = 24546 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/34/37/bfd0582e0879f6e38195a92564fa7923256490c32cf53c0e48cea98d3a86/edgedb_pydantic_codegen-2024.10.0-py3-none-any.whl", hash = "sha256:be04cb252299fec34f2ffe1fc999b01689e16d7fed820a78a108c79f45484348", size = 9115 },
+    { url = "https://files.pythonhosted.org/packages/20/cd/24b30b632d14ef815a73dac45dbfcb92c5766f32d52479ffa7e56111fa42/edgedb_pydantic_codegen-2024.10.4-py3-none-any.whl", hash = "sha256:8b90d585d915a3399e325b3b6428d3fffbb69c434385dc2a31704ca9a0a70f40", size = 9629 },
 ]
 
 [[package]]
@@ -681,7 +681,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "edgedb-pydantic-codegen", specifier = "==2024.10.0" },
+    { name = "edgedb-pydantic-codegen", specifier = "==2024.10.4" },
     { name = "pyinstrument", specifier = "==5.0.0" },
     { name = "pyright", specifier = "==1.1.384" },
     { name = "ruff", specifier = "==0.6.9" },
