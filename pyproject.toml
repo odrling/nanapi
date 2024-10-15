@@ -4,6 +4,11 @@ version = "0.1.0"
 description = "FastAPI + EdgeDB backend for Nana-chan"
 readme = "README.md"
 license = { file = "LICENSE" }
+authors = [
+    { name = "NextFire", email = "git@yuru.moe" },
+    { name = "odrling", email = "florianbadie@odrling.xyz" },
+    { name = "Pierre Jeanjean", email = "rhiobet@gmail.com" },
+]
 requires-python = ">=3.12"
 dependencies = [
     "edgedb==2.1.0",
@@ -37,6 +42,9 @@ dev-dependencies = [
     "edgedb-pydantic-codegen==2024.10.4",
     "pyinstrument==5.0.0",
 ]
+
+[project.urls]
+Homepage = "https://github.com/Japan7/mahou.py"
 
 [tool.pyright]
 pythonVersion = "3.12"
