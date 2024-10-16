@@ -78,13 +78,13 @@ class ProjoSelectResultParticipants(BaseModel):
 class ProjoSelectResultExternalMedias(BaseModel):
     id: UUID
     title: str
-    link_added: datetime | None = Field(alias='@added')
+    link_added: datetime | None = Field(serialization_alias='@added')
 
 
 class ProjoSelectResultMedias(BaseModel):
     id_al: int
     title_user_preferred: str
-    link_added: datetime | None = Field(alias='@added')
+    link_added: datetime | None = Field(serialization_alias='@added')
 
 
 class ProjoSelectResult(BaseModel):
