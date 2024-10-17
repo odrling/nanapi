@@ -4,7 +4,7 @@ from typing import Literal
 from uuid import UUID
 
 from edgedb import AsyncIOExecutor
-from pydantic import BaseModel, Field, TypeAdapter
+from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
 EDGEQL_QUERY = r"""
 with
@@ -76,12 +76,14 @@ class ProjoSelectResultParticipants(BaseModel):
 
 
 class ProjoSelectResultExternalMedias(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
     id: UUID
     title: str
     link_added: datetime | None = Field(validation_alias='@added', serialization_alias='@added')
 
 
 class ProjoSelectResultMedias(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
     id_al: int
     title_user_preferred: str
     link_added: datetime | None = Field(validation_alias='@added', serialization_alias='@added')
