@@ -54,7 +54,11 @@ ignore = ["nanapi/nanachan_v2_migrate.py"]
 
 [tool.ruff]
 line-length = 99
-exclude = ["nanapi/nanachan_v2_migrate.py", "nanapi/local_settings.py"]
+exclude = [
+    "nanapi/database",
+    "nanapi/nanachan_v2_migrate.py",
+    "nanapi/local_settings.py",
+]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "B", "SIM", "I"]
