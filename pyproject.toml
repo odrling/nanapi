@@ -3,7 +3,7 @@ name = "nanapi"
 version = "0.1.0"
 description = "FastAPI + EdgeDB backend for Nana-chan"
 readme = "README.md"
-license = { file = "LICENSE" }
+license = "MIT"
 authors = [
     { name = "NextFire", email = "git@yuru.moe" },
     { name = "odrling", email = "florianbadie@odrling.xyz" },
@@ -15,7 +15,8 @@ dependencies = [
     "fastapi==0.115.2",
     "pydantic==2.9.2",
     "aiohttp[speedups]==3.10.10",
-    "faust-cchardet==2.1.19",        # https://github.com/PyYoshi/cChardet/issues/81
+    # https://github.com/PyYoshi/cChardet/issues/81
+    "faust-cchardet==2.1.19",
     "orjson==3.10.7",
     "toolz==1.0.0",
     "backoff==2.2.1",
@@ -44,7 +45,7 @@ dev-dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/Japan7/mahou.py"
+homepage = "https://github.com/Japan7/mahou.py"
 
 [tool.pyright]
 pythonVersion = "3.12"
@@ -53,11 +54,7 @@ ignore = ["nanapi/nanachan_v2_migrate.py"]
 
 [tool.ruff]
 line-length = 99
-exclude = [
-    "nanapi/database",
-    "nanapi/nanachan_v2_migrate.py",
-    "nanapi/local_settings.py",
-]
+exclude = ["nanapi/nanachan_v2_migrate.py", "nanapi/local_settings.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "B", "SIM", "I"]
