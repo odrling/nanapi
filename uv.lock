@@ -771,7 +771,7 @@ requires-dist = [
     { name = "pillow", specifier = "==11.0.0" },
     { name = "pydantic", specifier = "==2.9.2" },
     { name = "pyjwt", specifier = "==2.9.0" },
-    { name = "python-multipart", git = "https://github.com/Kludex/python-multipart.git" },
+    { name = "python-multipart", git = "https://github.com/Kludex/python-multipart.git?rev=6e0a3d89ab78e64356ce7b1eaac4a8993cab39e4" },
     { name = "rich", specifier = "==13.9.3" },
     { name = "toolz", specifier = "==1.0.0" },
     { name = "tzdata", specifier = "==2024.2" },
@@ -1109,7 +1109,7 @@ wheels = [
 [[package]]
 name = "python-multipart"
 version = "0.0.14"
-source = { git = "https://github.com/Kludex/python-multipart.git#6e0a3d89ab78e64356ce7b1eaac4a8993cab39e4" }
+source = { git = "https://github.com/Kludex/python-multipart.git?rev=6e0a3d89ab78e64356ce7b1eaac4a8993cab39e4#6e0a3d89ab78e64356ce7b1eaac4a8993cab39e4" }
 
 [[package]]
 name = "requests"
