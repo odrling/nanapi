@@ -771,7 +771,7 @@ requires-dist = [
     { name = "pillow", specifier = "==11.0.0" },
     { name = "pydantic", specifier = "==2.9.2" },
     { name = "pyjwt", specifier = "==2.9.0" },
-    { name = "python-multipart", specifier = "==0.0.13" },
+    { name = "python-multipart", specifier = "==0.0.14" },
     { name = "rich", specifier = "==13.9.3" },
     { name = "toolz", specifier = "==1.0.0" },
     { name = "tzdata", specifier = "==2024.2" },
@@ -1108,11 +1108,11 @@ wheels = [
 
 [[package]]
 name = "python-multipart"
-version = "0.0.13"
+version = "0.0.14"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/a3/b7/008e43aa6f742f2287d94ae1c4a0767e7f9d227921064a4a498837b9c85f/python_multipart-0.0.13.tar.gz", hash = "sha256:fccee12108f0c61f753158de49c7259060652e23f9c3d23ca590c7391bb34b44", size = 36317 }
+sdist = { url = "https://files.pythonhosted.org/packages/db/af/b63323ac939fce55c71f28adfaab8dcc9f38ae1c03ba13741ca490d325bf/python_multipart-0.0.14.tar.gz", hash = "sha256:b8e744731296767cb005e1e9bd7bb985a77aa077de5406dbe59b588559b6f350", size = 35823 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ad/9e/865280a37d64d314fb0a33c7e6021a5cc06174c4488b277e46b8ac9cc708/python_multipart-0.0.13-py3-none-any.whl", hash = "sha256:18aafc9b0bae0ccc62309e2a03cccdb195e643b95a569a312479b2fdc385fc30", size = 24186 },
+    { url = "https://files.pythonhosted.org/packages/98/42/dd53dd3fae856bf201aba9cb9501916652bd4426fc9ca9336764fda216b6/python_multipart-0.0.14-py3-none-any.whl", hash = "sha256:bf01aea0941cd1173a97b7c53d8b686acd2fa535549b13431d8515467dabb2b4", size = 23268 },
 ]
 
 [[package]]
