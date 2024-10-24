@@ -771,7 +771,7 @@ requires-dist = [
     { name = "pillow", specifier = "==11.0.0" },
     { name = "pydantic", specifier = "==2.9.2" },
     { name = "pyjwt", specifier = "==2.9.0" },
-    { name = "python-multipart", specifier = "==0.0.14" },
+    { name = "python-multipart", git = "https://github.com/Kludex/python-multipart.git" },
     { name = "rich", specifier = "==13.9.3" },
     { name = "toolz", specifier = "==1.0.0" },
     { name = "tzdata", specifier = "==2024.2" },
@@ -1109,11 +1109,7 @@ wheels = [
 [[package]]
 name = "python-multipart"
 version = "0.0.14"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/db/af/b63323ac939fce55c71f28adfaab8dcc9f38ae1c03ba13741ca490d325bf/python_multipart-0.0.14.tar.gz", hash = "sha256:b8e744731296767cb005e1e9bd7bb985a77aa077de5406dbe59b588559b6f350", size = 35823 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/98/42/dd53dd3fae856bf201aba9cb9501916652bd4426fc9ca9336764fda216b6/python_multipart-0.0.14-py3-none-any.whl", hash = "sha256:bf01aea0941cd1173a97b7c53d8b686acd2fa535549b13431d8515467dabb2b4", size = 23268 },
-]
+source = { git = "https://github.com/Kludex/python-multipart.git#6e0a3d89ab78e64356ce7b1eaac4a8993cab39e4" }
 
 [[package]]
 name = "requests"
