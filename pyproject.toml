@@ -35,8 +35,8 @@ dependencies = [
     "ics==0.7.2",
 ]
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "pyright==1.1.386",
     "ruff==0.7.1",
     "uvicorn==0.32.0",
