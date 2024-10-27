@@ -758,7 +758,7 @@ dependencies = [
     { name = "tzdata" },
 ]
 
-[package.dev-dependencies]
+[package.dependency-groups]
 dev = [
     { name = "edgedb-pydantic-codegen" },
     { name = "pyinstrument" },
@@ -786,13 +786,13 @@ requires-dist = [
     { name = "pillow", specifier = "==11.0.0" },
     { name = "pydantic", specifier = "==2.9.2" },
     { name = "pyjwt", specifier = "==2.9.0" },
-    { name = "python-multipart", specifier = "==0.0.12" },
+    { name = "python-multipart", specifier = "==0.0.15" },
     { name = "rich", specifier = "==13.9.3" },
     { name = "toolz", specifier = "==1.0.0" },
     { name = "tzdata", specifier = "==2024.2" },
 ]
 
-[package.metadata.requires-dev]
+[package.metadata.dependency-groups]
 dev = [
     { name = "edgedb-pydantic-codegen", specifier = "==2024.10.6" },
     { name = "pyinstrument", specifier = "==5.0.0" },
@@ -1123,11 +1123,11 @@ wheels = [
 
 [[package]]
 name = "python-multipart"
-version = "0.0.12"
+version = "0.0.15"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/16/6e/7ecfe1366b9270f7f475c76fcfa28812493a6a1abd489b2433851a444f4f/python_multipart-0.0.12.tar.gz", hash = "sha256:045e1f98d719c1ce085ed7f7e1ef9d8ccc8c02ba02b5566d5f7521410ced58cb", size = 35713 }
+sdist = { url = "https://files.pythonhosted.org/packages/7e/32/6af4ed8bf8efa28b32ebb15f1d375dac0206ec9a59a63f9d8f23e0f8a752/python_multipart-0.0.15.tar.gz", hash = "sha256:7be357d5aec4b59cc4e4999a7e442dfc7eb0c6c0126422ae22c1f2f50ceab6a7", size = 36347 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f5/0b/c316262244abea7481f95f1e91d7575f3dfcf6455d56d1ffe9839c582eb1/python_multipart-0.0.12-py3-none-any.whl", hash = "sha256:43dcf96cf65888a9cd3423544dd0d75ac10f7aa0c3c28a175bbcd00c9ce1aebf", size = 23246 },
+    { url = "https://files.pythonhosted.org/packages/a0/b0/1f4781c7764dbf1dc091bf39c2125275587d9ebc5fece14f863aee457aa0/python_multipart-0.0.15-py3-none-any.whl", hash = "sha256:167e3fc3d115de7849efb43e061f213350c87d72ba64fcd014b0ae15ce5e7d4c", size = 24392 },
 ]
 
 [[package]]
