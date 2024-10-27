@@ -758,7 +758,7 @@ dependencies = [
     { name = "tzdata" },
 ]
 
-[package.dev-dependencies]
+[package.dependency-groups]
 dev = [
     { name = "edgedb-pydantic-codegen" },
     { name = "pyinstrument" },
@@ -786,13 +786,13 @@ requires-dist = [
     { name = "pillow", specifier = "==11.0.0" },
     { name = "pydantic", specifier = "==2.9.2" },
     { name = "pyjwt", specifier = "==2.9.0" },
-    { name = "python-multipart", specifier = "==0.0.12" },
+    { name = "python-multipart", specifier = "==0.0.16" },
     { name = "rich", specifier = "==13.9.3" },
     { name = "toolz", specifier = "==1.0.0" },
     { name = "tzdata", specifier = "==2024.2" },
 ]
 
-[package.metadata.requires-dev]
+[package.metadata.dependency-groups]
 dev = [
     { name = "edgedb-pydantic-codegen", specifier = "==2024.10.6" },
     { name = "pyinstrument", specifier = "==5.0.0" },
@@ -1123,11 +1123,11 @@ wheels = [
 
 [[package]]
 name = "python-multipart"
-version = "0.0.12"
+version = "0.0.16"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/16/6e/7ecfe1366b9270f7f475c76fcfa28812493a6a1abd489b2433851a444f4f/python_multipart-0.0.12.tar.gz", hash = "sha256:045e1f98d719c1ce085ed7f7e1ef9d8ccc8c02ba02b5566d5f7521410ced58cb", size = 35713 }
+sdist = { url = "https://files.pythonhosted.org/packages/b9/59/cbb0dc4eb07c2676d964d7ef986314abd0b90ef2b683864a04c13590487d/python_multipart-0.0.16.tar.gz", hash = "sha256:8dee37b88dab9b59922ca173c35acb627cc12ec74019f5cd4578369c6df36554", size = 36404 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f5/0b/c316262244abea7481f95f1e91d7575f3dfcf6455d56d1ffe9839c582eb1/python_multipart-0.0.12-py3-none-any.whl", hash = "sha256:43dcf96cf65888a9cd3423544dd0d75ac10f7aa0c3c28a175bbcd00c9ce1aebf", size = 23246 },
+    { url = "https://files.pythonhosted.org/packages/ff/ec/e85b99fda29a3e7643ee39419fdd478782dbcd61c11d846a9a8fc748fff2/python_multipart-0.0.16-py3-none-any.whl", hash = "sha256:c2759b7b976ef3937214dfb592446b59dfaa5f04682a076f78b117c94776d87a", size = 24426 },
 ]
 
 [[package]]
