@@ -268,6 +268,11 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/32/e5/806359514cc8305f047bd6d39d63890298c0596f7328b534059724bd1a9e/camel_converter-4.0.1-py3-none-any.whl", hash = "sha256:0cba7ca1354a29ca2191983deecc9dcf28889f606c28d6ed18ac7d4586b163ac", size = 6243 },
 ]
 
+[package.optional-dependencies]
+pydantic = [
+    { name = "pydantic" },
+]
+
 [[package]]
 name = "certifi"
 version = "2024.8.30"
@@ -677,18 +682,18 @@ wheels = [
 
 [[package]]
 name = "meilisearch-python-sdk"
-version = "3.5.1"
+version = "3.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
-    { name = "camel-converter" },
+    { name = "camel-converter", extra = ["pydantic"] },
     { name = "httpx", extra = ["http2"] },
     { name = "pydantic" },
     { name = "pyjwt" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d2/2b/1436fd817cf5aa995af4b99aeeefb1cf1bb4d77bd30a6d1c3178807b0f5b/meilisearch_python_sdk-3.5.1.tar.gz", hash = "sha256:3ca266c5b133a249787f6206bcc3734189ad4a7ebdca56b778bce6e9bd16d33d", size = 218475 }
+sdist = { url = "https://files.pythonhosted.org/packages/cd/a8/db8ddf7f88605b255dd1ed1a54da37b7f71a9c4d5d63cf675d34c8504e2b/meilisearch_python_sdk-3.6.0.tar.gz", hash = "sha256:a42b38b8eb7359edb16a36436dc2bcf5788802dae46924fdc8f7b8aad8a7e303", size = 219538 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a0/30/68af3ddd337410c23ce493582e2a775e9fa5d49a93519161828e288d2ca9/meilisearch_python_sdk-3.5.1-py3-none-any.whl", hash = "sha256:2ca02f59be8e90267342fdb3d6c5bb1382b59f50ecfef44e21ce56c85c10031d", size = 57751 },
+    { url = "https://files.pythonhosted.org/packages/ea/2c/48708ee4698826a5403b8b6c43c5ad2336ae79aafc8493d43caf8a8bdb17/meilisearch_python_sdk-3.6.0-py3-none-any.whl", hash = "sha256:9a70159b030b4b8e68fcd191f201840a1e1bb1b97e24545b576070d151857015", size = 58194 },
 ]
 
 [[package]]
@@ -779,7 +784,7 @@ requires-dist = [
     { name = "faust-cchardet", specifier = "==2.1.19" },
     { name = "hypercorn", specifier = "==0.17.3" },
     { name = "ics", specifier = "==0.7.2" },
-    { name = "meilisearch-python-sdk", specifier = "==3.5.1" },
+    { name = "meilisearch-python-sdk", specifier = "==3.6.0" },
     { name = "numpy", specifier = "==2.1.2" },
     { name = "orjson", specifier = "==3.10.10" },
     { name = "passlib", extras = ["bcrypt"], specifier = "==1.7.4" },
