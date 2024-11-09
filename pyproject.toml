@@ -54,11 +54,7 @@ ignore = ["nanapi/nanachan_v2_migrate.py"]
 
 [tool.ruff]
 line-length = 99
-exclude = [
-    "nanapi/database",
-    "nanapi/nanachan_v2_migrate.py",
-    "nanapi/local_settings.py",
-]
+exclude = ["nanapi/nanachan_v2_migrate.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "B", "SIM", "I"]
@@ -78,6 +74,10 @@ ignore = [
     # Use ternary operator `{contents}` instead of if-else-block
     "SIM108",
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"nanapi/database/*" = ["E501"]
+"nanapi/*local_settings.py" = ["E501"]
 
 [tool.ruff.format]
 quote-style = "single"
