@@ -1,13 +1,19 @@
 # nanapi
 
-## Clone nanapi
+## Develop with nanadev 🏠🍽️
+
+One-click™ dev environment for nanapi and nanachan: https://github.com/Japan7/nanadev
+
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/Japan7/nanadev)
+
+## Develop locally
 
 ```sh
 git clone https://github.com/Japan7/nanapi.git
 cd nanapi/
 ```
 
-## Setup EdgeDB
+### Setup EdgeDB
 
 Follow the installation guide: https://www.edgedb.com/install
 
@@ -19,13 +25,18 @@ edgedb project init
 
 Web UI: `edgedb ui`
 
-## Setup Meilisearch
+### Setup Meilisearch
 
 ```sh
 docker run -d --name meilisearch -p 7700:7700 getmeili/meilisearch:latest
 ```
 
-## Launch nanapi
+## Local Settings
+
+1. Copy [`nanapi/example.local_settings.py`](nanapi/example.local_settings.py) to `nanapi/local_settings.py`
+2. Fill all the uncommented required variables
+
+## Run nanapi
 
 ```sh
 uv run --frozen -m nanapi
