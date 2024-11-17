@@ -31,7 +31,7 @@ dependencies = [
     "asyncache==0.3.1",
     "hypercorn==0.17.3",
     "tzdata==2024.2",
-    "pyjwt==2.9.0",
+    "pyjwt==2.10.0",
     "ics==0.7.2",
 ]
 
