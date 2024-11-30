@@ -80,6 +80,9 @@ from nanapi.database.waicolle.player_tracked_items import (
     PlayerTrackedItemsResult,
     player_tracked_items,
 )
+from nanapi.database.waicolle.rerollop_insert import rerollop_insert
+from nanapi.database.waicolle.rollop_insert import rollop_insert
+from nanapi.database.waicolle.trade_commit import trade_commit
 from nanapi.database.waicolle.trade_delete import TradeDeleteResult, trade_delete
 from nanapi.database.waicolle.trade_get_by_id import trade_get_by_id
 from nanapi.database.waicolle.trade_insert import trade_insert
@@ -87,7 +90,6 @@ from nanapi.database.waicolle.trade_select import TradeSelectResult, trade_selec
 from nanapi.database.waicolle.waifu_ascendable import waifu_ascendable
 from nanapi.database.waicolle.waifu_bulk_update import WaifuBulkUpdateResult, waifu_bulk_update
 from nanapi.database.waicolle.waifu_change_owner import waifu_change_owner
-from nanapi.database.waicolle.waifu_delete import waifu_delete
 from nanapi.database.waicolle.waifu_edged import waifu_edged
 from nanapi.database.waicolle.waifu_export import WaifuExportResult, waifu_export
 from nanapi.database.waicolle.waifu_insert import waifu_insert
@@ -102,6 +104,7 @@ from nanapi.database.waicolle.waifu_select_by_chara import (
 )
 from nanapi.database.waicolle.waifu_select_by_user import waifu_select_by_user
 from nanapi.database.waicolle.waifu_track_unlocked import waifu_track_unlocked
+from nanapi.database.waicolle.waifu_update_ascended_from import waifu_update_ascended_from
 from nanapi.database.waicolle.waifu_update_custom_image_name import (
     WaifuUpdateCustomImageNameResult,
     waifu_update_custom_image_name,
@@ -292,6 +295,7 @@ async def player_roll(discord_id: int,
                 await coupon_add_player(tx,
                                         code=coupon_code,
                                         discord_id=discord_id)
+                roll_id = 'coupon'
                 roll = UserRoll(3)
             elif roll_id is not None:
                 roll_getter = ROLLS.get(roll_id, None)
@@ -300,6 +304,7 @@ async def player_roll(discord_id: int,
                                         detail='Roll Not Found')
                 roll = roll_getter()
             elif nb is not None:
+                roll_id = 'drop'
                 roll = UserRoll(nb)
             else:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
@@ -329,6 +334,14 @@ async def player_roll(discord_id: int,
 
             # Do after task
             await roll.after(tx, discord_id)
+
+            await rollop_insert(
+                tx,
+                author_discord_id=discord_id,
+                received_ids=[w.id for w in new_waifus],
+                roll_id=roll_id,
+                moecoins=price,
+            )
 
             return new_waifus
 
@@ -884,6 +897,14 @@ async def reroll(body: RerollBody,
                                       discord_id=body.player_discord_id,
                                       charas_ids=charas_ids)
             await roll.after(tx, body.player_discord_id)
+
+            await rerollop_insert(
+                tx,
+                author_discord_id=body.player_discord_id,
+                received_ids=[w.id for w in resp],
+                rerolled_ids=[w.id for w in rerolled],
+            )
+
             return dict(obtained=resp, nanascends=nanascends)
 
 
@@ -902,7 +923,11 @@ async def ascend_all(tx: AsyncIOExecutor,
                                                ids=[to_ascend.id],
                                                level=to_ascend.level + 1,
                                                timestamp=datetime.now(tz=TZ))
-                await waifu_delete(tx, ids=[e.id for e in to_delete])
+                await waifu_update_ascended_from(
+                    tx,
+                    ascended_id=to_ascend.id,
+                    ascended_from_ids=[e.id for e in to_delete],
+                )
                 _ascended.append(resp[0])
                 elements = elements[4:]
         if _ascended:
@@ -992,7 +1017,11 @@ async def ascend_waifu(id: UUID,
                                                ids=[to_ascend.id],
                                                level=to_ascend.level + 1,
                                                timestamp=datetime.now(tz=TZ))
-            await waifu_delete(tx, ids=[e.id for e in to_delete])
+            await waifu_update_ascended_from(
+                tx,
+                ascended_id=to_ascend.id,
+                ascended_from_ids=[e.id for e in to_delete],
+            )
 
             return ascended[0]
 
@@ -1069,11 +1098,11 @@ async def new_offering(body: NewOfferingBody,
     rank = RANKS[chara.rank]
 
     return await trade_insert(edgedb,
-                              player_a_discord_id=body.bot_discord_id,
-                              waifus_a_ids=[to_trade.id],
-                              player_b_discord_id=body.player_discord_id,
-                              waifus_b_ids=[],
-                              blood_shards_b=rank.blood_price * pow(4, to_trade.level))
+                              author_discord_id=body.player_discord_id,
+                              received_ids=[to_trade.id],
+                              offeree_discord_id=body.bot_discord_id,
+                              offered_ids=[],
+                              blood_shards=rank.blood_price * pow(4, to_trade.level))
 
 
 @router.oauth2_client_restricted.delete(
@@ -1102,34 +1131,32 @@ async def commit_trade(id: UUID,
             trade = await trade_get_by_id(tx, id=id)
             if trade is None:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-            delete = await trade_delete(tx, id=id)
-            assert delete is not None
+            commit = await trade_commit(tx, id=id)
+            assert commit is not None
 
             try:
                 await player_add_coins(
                     tx,
-                    discord_id=trade.player_a.user.discord_id,
-                    moecoins=-(trade.moecoins_a or 0),
-                    blood_shards=-(trade.blood_shards_a or 0))
+                    discord_id=trade.author.user.discord_id,
+                    blood_shards=-trade.blood_shards or 0)
                 await player_add_coins(
                     tx,
-                    discord_id=trade.player_b.user.discord_id,
-                    moecoins=-(trade.moecoins_b or 0),
-                    blood_shards=-(trade.blood_shards_b or 0))
+                    discord_id=trade.offeree.user.discord_id,
+                    blood_shards=trade.blood_shards or 0)
             except ConstraintViolationError as e:
                 raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                                     detail=str(e))
 
             resp3 = await waifu_change_owner(
                 tx,
-                discord_id=trade.player_a.user.discord_id,
-                ids=[w.id for w in trade.waifus_b])
+                discord_id=trade.author.user.discord_id,
+                ids=[w.id for w in trade.received])
             resp4 = await waifu_change_owner(
                 tx,
-                discord_id=trade.player_b.user.discord_id,
-                ids=[w.id for w in trade.waifus_a])
+                discord_id=trade.offeree.user.discord_id,
+                ids=[w.id for w in trade.offered])
 
-            return dict(waifus_a=resp3, waifus_b=resp4)
+            return dict(received=resp3, offered=resp4)
 
 
 ###############
