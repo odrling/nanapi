@@ -8,8 +8,8 @@ with
   nanaed := <optional bool>$nanaed,
   custom_collage := <optional bool>$custom_collage,
   ascended := <optional bool>$ascended,
-  disabled := <optional bool>$disabled,
   as_og := <optional bool>$as_og ?? false,
+  disabled := <optional bool>$disabled ?? false,
   player := (select waicolle::Player filter .client = global client and .user.discord_id = discord_id),
 select waicolle::Waifu {
   id,
@@ -48,5 +48,5 @@ and (.blooded = blooded if exists blooded else true)
 and (.nanaed = nanaed if exists nanaed else true)
 and (.custom_collage = custom_collage if exists custom_collage else true)
 and (.level > 0 if exists ascended else true)
-and (.disabled = disabled if exists disabled else false)
+and .disabled = disabled
 order by .timestamp desc
