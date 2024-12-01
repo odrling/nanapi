@@ -1098,10 +1098,10 @@ async def new_offering(body: NewOfferingBody,
     rank = RANKS[chara.rank]
 
     return await trade_insert(edgedb,
-                              author_discord_id=body.bot_discord_id,
-                              received_ids=[],
-                              offeree_discord_id=body.player_discord_id,
-                              offered_ids=[to_trade.id],
+                              author_discord_id=body.player_discord_id,
+                              received_ids=[to_trade.id],
+                              offeree_discord_id=body.bot_discord_id,
+                              offered_ids=[],
                               blood_shards=rank.blood_price * pow(4, to_trade.level))
 
 
@@ -1138,11 +1138,11 @@ async def commit_trade(id: UUID,
                 await player_add_coins(
                     tx,
                     discord_id=trade.author.user.discord_id,
-                    blood_shards=trade.blood_shards or 0)
+                    blood_shards=-trade.blood_shards or 0)
                 await player_add_coins(
                     tx,
                     discord_id=trade.offeree.user.discord_id,
-                    blood_shards=-trade.blood_shards or 0)
+                    blood_shards=trade.blood_shards or 0)
             except ConstraintViolationError as e:
                 raise HTTPException(status_code=status.HTTP_409_CONFLICT,
                                     detail=str(e))
