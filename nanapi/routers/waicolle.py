@@ -283,7 +283,13 @@ async def player_roll(discord_id: int,
                                     detail='Player Not Found')
 
             # Get Roll
-            if coupon_code is not None:
+            if roll_id is not None:
+                roll_getter = ROLLS.get(roll_id, None)
+                if roll_getter is None:
+                    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                                        detail='Roll Not Found')
+                roll = roll_getter()
+            elif coupon_code is not None:
                 # Check eligibility
                 coupon = await coupon_get_by_code(tx, code=coupon_code)
                 if coupon is None:
@@ -295,17 +301,11 @@ async def player_roll(discord_id: int,
                 await coupon_add_player(tx,
                                         code=coupon_code,
                                         discord_id=discord_id)
-                roll_id = 'coupon'
                 roll = UserRoll(3)
-            elif roll_id is not None:
-                roll_getter = ROLLS.get(roll_id, None)
-                if roll_getter is None:
-                    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                        detail='Roll Not Found')
-                roll = roll_getter()
+                roll_id = 'coupon'
             elif nb is not None:
-                roll_id = 'drop'
                 roll = UserRoll(nb)
+                roll_id = 'drop'
             else:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
