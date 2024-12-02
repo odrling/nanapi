@@ -1168,7 +1168,7 @@ async def commit_trade(id: UUID,
     async for tx in edgedb.transaction():
         async with tx:
             trade = await trade_get_by_id(tx, id=id)
-            if (trade is None) or (trade.completed_at is not None):
+            if trade is None:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
             if trade.completed_at is not None:
                 raise HTTPException(status_code=status.HTTP_409_CONFLICT)

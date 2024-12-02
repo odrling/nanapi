@@ -18,4 +18,3 @@ select waicolle::TradeOperation {
   offered,
 }
 filter .id = id
-and not exists .completed_at
