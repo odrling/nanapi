@@ -55,6 +55,7 @@ from nanapi.database.waicolle.player_collection_stats import (
     PlayerCollectionStatsResult,
     player_collection_stats,
 )
+from nanapi.database.waicolle.player_freeze import PlayerFreezeResult, player_freeze
 from nanapi.database.waicolle.player_get_by_user import PlayerGetByUserResult, player_get_by_user
 from nanapi.database.waicolle.player_media_stats import PlayerMediaStatsResult, player_media_stats
 from nanapi.database.waicolle.player_merge import PlayerMergeResult, player_merge
@@ -124,6 +125,7 @@ from nanapi.models.waicolle import (
     MediaAlbumResult,
     NewCollectionBody,
     NewCouponBody,
+    NewLootBody,
     NewOfferingBody,
     NewTradeBody,
     PlayerSelectResult,
@@ -185,6 +187,18 @@ async def upsert_player(discord_id: int,
 async def get_player(discord_id: int,
                      edgedb: AsyncIOClient = Depends(get_client_edgedb)):
     resp = await player_get_by_user(edgedb, discord_id=discord_id)
+    if resp is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    return resp
+
+
+@router.oauth2_client_restricted.put(
+    '/players/{discord_id}/freeze',
+    response_model=PlayerFreezeResult,
+    responses={status.HTTP_404_NOT_FOUND: dict(model=HTTPExceptionModel)})
+async def freeze_player(discord_id: int,
+                        edgedb: AsyncIOClient = Depends(get_client_edgedb)):
+    resp = await player_freeze(edgedb, discord_id=discord_id)
     if resp is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return resp
@@ -1103,6 +1117,28 @@ async def new_offering(body: NewOfferingBody,
                               offeree_discord_id=body.bot_discord_id,
                               offered_ids=[],
                               blood_shards=rank.blood_price * pow(4, to_trade.level))
+
+
+@router.oauth2_client_restricted.post(
+    '/trades/loots',
+    response_model=TradeSelectResult,
+    status_code=status.HTTP_201_CREATED,
+    responses={status.HTTP_404_NOT_FOUND: dict(model=HTTPExceptionModel)})
+async def new_loot(body: NewLootBody, edgedb: AsyncIOClient = Depends(get_client_edgedb)):
+    waifus = await waifu_select_by_chara(edgedb, id_al=body.chara_id_al)
+    waifus = sorted(waifus, key=lambda w: (w.level, w.timestamp))
+    for waifu in waifus:
+        if all((waifu.frozen, not waifu.blooded, not waifu.locked, not waifu.trade_locked)):
+            to_trade = waifu
+            break
+    else:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+
+    return await trade_insert(edgedb,
+                              author_discord_id=body.player_discord_id,
+                              received_ids=[to_trade.id],
+                              offeree_discord_id=to_trade.owner.user.discord_id,
+                              offered_ids=[])
 
 
 @router.oauth2_client_restricted.delete(
