@@ -8,7 +8,6 @@ with
     set {
       moecoins := .moecoins + (moecoins ?? 0),
       blood_shards := .blood_shards + (blood_shards ?? 0),
-      frozen_at := {},
     }
   )
 select updated {
