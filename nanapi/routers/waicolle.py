@@ -278,6 +278,7 @@ async def donate_player_coins(
     response_model=list[WaifuSelectResult],
     status_code=status.HTTP_201_CREATED,
     responses={
+        status.HTTP_204_NO_CONTENT: {},
         status.HTTP_400_BAD_REQUEST: dict(model=HTTPExceptionModel),
         status.HTTP_404_NOT_FOUND: dict(model=HTTPExceptionModel),
         status.HTTP_409_CONFLICT: dict(model=HTTPExceptionModel),
@@ -295,6 +296,8 @@ async def player_roll(discord_id: int,
             if player is None:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                     detail='Player Not Found')
+            if player.frozen_at is not None:
+                return Response(status_code=status.HTTP_204_NO_CONTENT)
 
             # Get Roll
             if roll_id is not None:
