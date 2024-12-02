@@ -22,17 +22,7 @@ for id_al in array_unpack(charas_ids) union (
       }
     ),
   select inserted {
-    id,
-    timestamp,
-    level,
-    trade_locked,
-    locked,
-    blooded,
-    nanaed,
-    custom_image,
-    custom_name,
-    custom_collage,
-    custom_position,
+    *,
     character: { id_al },
     owner: {
       user: {
@@ -85,21 +75,23 @@ class WaifuInsertResultCharacter(BaseModel):
 
 
 class WaifuInsertResult(BaseModel):
-    id: UUID
-    timestamp: datetime
-    level: int
-    trade_locked: bool
-    locked: bool
-    blooded: bool
-    nanaed: bool
-    custom_image: str | None
-    custom_name: str | None
-    custom_collage: bool
-    custom_position: WaicolleCollagePosition
     character: WaifuInsertResultCharacter
     owner: WaifuInsertResultOwner
     original_owner: WaifuInsertResultOriginalOwner | None
     custom_position_waifu: WaifuInsertResultCustomPositionWaifu | None
+    frozen: bool
+    disabled: bool
+    trade_locked: bool
+    timestamp: datetime
+    nanaed: bool
+    locked: bool
+    level: int
+    custom_position: WaicolleCollagePosition
+    custom_name: str | None
+    custom_image: str | None
+    custom_collage: bool
+    blooded: bool
+    id: UUID
 
 
 adapter = TypeAdapter(list[WaifuInsertResult])

@@ -14,17 +14,7 @@ for id_al in array_unpack(charas_ids) union (
       }
     ),
   select inserted {
-    id,
-    timestamp,
-    level,
-    trade_locked,
-    locked,
-    blooded,
-    nanaed,
-    custom_image,
-    custom_name,
-    custom_collage,
-    custom_position,
+    *,
     character: { id_al },
     owner: {
       user: {
