@@ -48,3 +48,4 @@ select waicolle::TradeOperation {
   },
 }
 filter .client = global client
+and not exists .completed_at
