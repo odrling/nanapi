@@ -29,6 +29,7 @@ with
           filter .character.id_al = chara_id_al
           and .owner = player
           and .locked
+          and not .disabled
         ),
       select count(owned) != 1
     ) if hide_singles else true)
@@ -43,6 +44,7 @@ with
           filter .character.id_al = chara_id_al
           and .owner = player
           and .locked
+          and not .disabled
         ),
       select count(owned) > 1
     )
