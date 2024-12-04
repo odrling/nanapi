@@ -112,7 +112,7 @@ module waicolle {
   }
 
   type RollOperation extending default::ClientObject, Operation {
-    required property roll_id -> str;
+    required property reason -> str;
     required property moecoins -> int32 {
       default := 0;
     }

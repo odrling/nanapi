@@ -288,6 +288,7 @@ async def player_roll(discord_id: int,
                       coupon_code: str | None = None,
                       nb: int | None = None,
                       pool_discord_id: int | None = None,
+                      reason: str | None = None,
                       edgedb: AsyncIOClient = Depends(get_client_edgedb)):
     async for tx in edgedb.transaction():
         async with tx:
@@ -306,6 +307,7 @@ async def player_roll(discord_id: int,
                     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                         detail='Roll Not Found')
                 roll = roll_getter()
+                reason = reason if reason is not None else roll_id
             elif coupon_code is not None:
                 # Check eligibility
                 coupon = await coupon_get_by_code(tx, code=coupon_code)
@@ -319,10 +321,10 @@ async def player_roll(discord_id: int,
                                         code=coupon_code,
                                         discord_id=discord_id)
                 roll = UserRoll(3)
-                roll_id = 'coupon'
+                reason = reason if reason is not None else 'coupon'
             elif nb is not None:
                 roll = UserRoll(nb)
-                roll_id = 'drop'
+                reason = reason if reason is not None else 'drop'
             else:
                 raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST)
 
@@ -356,7 +358,7 @@ async def player_roll(discord_id: int,
                 tx,
                 author_discord_id=discord_id,
                 received_ids=[w.id for w in new_waifus],
-                roll_id=roll_id,
+                reason=reason,
                 moecoins=price,
             )
 
