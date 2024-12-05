@@ -430,10 +430,10 @@ async def get_player_track_reversed(
         ],
     ] = {}
     for id_al, ttask, wtask in tasks:
-        trackers_map = {t.user.discord_id: t for t in ttask.result()}
+        trackers_map = {t.user.discord_id: t for t in ttask.result() if t.frozen_at is None}
         locked_map = defaultdict[int, list[WaifuSelectByCharaResult]](list)
         for w in wtask.result():
-            if w.locked:
+            if w.locked and not w.frozen:
                 locked_map[w.owner.user.discord_id].append(w)
                 trackers_map.pop(w.owner.user.discord_id, None)
         if hide_singles:
