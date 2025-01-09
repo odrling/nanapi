@@ -31,12 +31,10 @@ _basic_auth = HTTPBasic()
 def japan7_basic_auth(credentials: HTTPBasicCredentials = Depends(_basic_auth)) -> None:
     current_username_bytes = credentials.username.encode()
     correct_username_bytes = BASIC_AUTH_USERNAME.encode()
-    is_correct_username = secrets.compare_digest(current_username_bytes,
-                                                 correct_username_bytes)
+    is_correct_username = secrets.compare_digest(current_username_bytes, correct_username_bytes)
     current_password_bytes = credentials.password.encode()
     correct_password_bytes = BASIC_AUTH_PASSWORD.encode()
-    is_correct_password = secrets.compare_digest(current_password_bytes,
-                                                 correct_password_bytes)
+    is_correct_password = secrets.compare_digest(current_password_bytes, correct_password_bytes)
     if not (is_correct_username and is_correct_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -48,8 +46,7 @@ def japan7_basic_auth(credentials: HTTPBasicCredentials = Depends(_basic_auth)) 
 OAUTH2_SCHEME = OAuth2PasswordBearer(tokenUrl='clients/token')
 
 
-async def authenticate_client(
-        username: str, password: str) -> ClientGetByUsernameResult | None:
+async def authenticate_client(username: str, password: str) -> ClientGetByUsernameResult | None:
     client = await client_get_by_username(get_edgedb(), username=username)
     if not client:
         return None
@@ -63,8 +60,7 @@ class Token(BaseModel):
     token_type: str
 
 
-def create_access_token(data: dict,
-                        expires_delta: timedelta | None = None) -> str:
+def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.now(UTC) + expires_delta

@@ -20,11 +20,11 @@ async def feed_meili_medias():
     if len(items) == 0:
         return
     items_dict = [item.model_dump() for item in items]
-    logger.debug(f"indexing {len(items_dict)} medias")
+    logger.debug(f'indexing {len(items_dict)} medias')
     async with get_meilisearch() as client:
-        index = client.index(f"{INSTANCE_NAME}_medias")
-        await index.update_filterable_attributes(["type"])
-        await index.add_documents(items_dict, primary_key="id_al")
+        index = client.index(f'{INSTANCE_NAME}_medias')
+        await index.update_filterable_attributes(['type'])
+        await index.add_documents(items_dict, primary_key='id_al')
 
 
 @webhook_exceptions
@@ -34,10 +34,10 @@ async def feed_meili_charas():
     if len(items) == 0:
         return
     items_dict = [item.model_dump() for item in items]
-    logger.debug(f"indexing {len(items_dict)} charas")
+    logger.debug(f'indexing {len(items_dict)} charas')
     async with get_meilisearch() as client:
-        index = client.index(f"{INSTANCE_NAME}_charas")
-        await index.add_documents(items_dict, primary_key="id_al")
+        index = client.index(f'{INSTANCE_NAME}_charas')
+        await index.add_documents(items_dict, primary_key='id_al')
 
 
 @webhook_exceptions
@@ -47,10 +47,10 @@ async def feed_meili_staffs():
     if len(items) == 0:
         return
     items_dict = [item.model_dump() for item in items]
-    logger.debug(f"indexing {len(items_dict)} staffs")
+    logger.debug(f'indexing {len(items_dict)} staffs')
     async with get_meilisearch() as client:
-        index = client.index(f"{INSTANCE_NAME}_staffs")
-        await index.add_documents(items_dict, primary_key="id_al")
+        index = client.index(f'{INSTANCE_NAME}_staffs')
+        await index.add_documents(items_dict, primary_key='id_al')
 
 
 @webhook_exceptions
@@ -59,15 +59,17 @@ async def feed_meili_collections():
     async with get_meilisearch() as client:
         for group in resp:
             client_id = group.key.client.id
-            index = client.index(f"{INSTANCE_NAME}_collections_{client_id}")
+            index = client.index(f'{INSTANCE_NAME}_collections_{client_id}')
             await index.delete_all_documents()
             docs = [
-                dict(id=str(collec.id),
-                     name=collec.name,
-                     author_discord_id=collec.author.user.discord_id)
+                dict(
+                    id=str(collec.id),
+                    name=collec.name,
+                    author_discord_id=collec.author.user.discord_id,
+                )
                 for collec in group.elements
             ]
-            await index.add_documents(docs, primary_key="id")
+            await index.add_documents(docs, primary_key='id')
 
 
 async def main():

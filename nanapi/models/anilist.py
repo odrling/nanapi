@@ -36,12 +36,14 @@ class MediaTag(BaseModel):
     isAdult: Optional[bool] = None
 
     def to_edgedb(self):
-        data = dict(id_al=self.id,
-                    rank=self.rank,
-                    name=self.name,
-                    description=self.description,
-                    category=self.category,
-                    is_adult=self.isAdult)
+        data = dict(
+            id_al=self.id,
+            rank=self.rank,
+            name=self.name,
+            description=self.description,
+            category=self.category,
+            is_adult=self.isAdult,
+        )
         return data
 
 
@@ -56,9 +58,7 @@ class ALBaseModel(BaseModel):
     siteUrl: Optional[str] = None
 
     def to_edgedb(self) -> Any:
-        data = dict(id_al=self.id,
-                    favourites=self.favourites,
-                    site_url=self.siteUrl)
+        data = dict(id_al=self.id, favourites=self.favourites, site_url=self.siteUrl)
         return data
 
     def __hash__(self):
@@ -87,8 +87,9 @@ class ALMedia(ALBaseModel):
     title: Optional[ALMediaTitle] = None
     synonyms: Optional[list[str]] = None
     description: Optional[str] = None
-    status: Optional[Literal['FINISHED', 'RELEASING', 'NOT_YET_RELEASED',
-                             'CANCELLED', 'HIATUS']] = None
+    status: Optional[
+        Literal['FINISHED', 'RELEASING', 'NOT_YET_RELEASED', 'CANCELLED', 'HIATUS']
+    ] = None
     season: Optional[Literal['WINTER', 'SPRING', 'SUMMER', 'FALL']] = None
     seasonYear: Optional[int] = None
     episodes: Optional[int] = None
@@ -116,14 +117,19 @@ class ALMedia(ALBaseModel):
             chapters=self.chapters,
             popularity=self.popularity,
             is_adult=self.isAdult,
-            genres=self.genres)
+            genres=self.genres,
+        )
         if self.title is not None:
-            data |= dict(title_user_preferred=self.title.userPreferred,
-                         title_english=self.title.english,
-                         title_native=self.title.native)
+            data |= dict(
+                title_user_preferred=self.title.userPreferred,
+                title_english=self.title.english,
+                title_native=self.title.native,
+            )
         if self.coverImage is not None:
-            data |= dict(cover_image_extra_large=self.coverImage.extraLarge,
-                         cover_image_color=self.coverImage.color)
+            data |= dict(
+                cover_image_extra_large=self.coverImage.extraLarge,
+                cover_image_color=self.coverImage.color,
+            )
         if self.tags is not None:
             data |= dict(tags=[tag.to_edgedb() for tag in self.tags])
         return data
@@ -163,19 +169,25 @@ class ALStaff(ALBaseModel):
             age=self.age,
         )
         if self.name:
-            data |= dict(name_user_preferred=self.name.userPreferred,
-                         name_alternative=self.name.alternative,
-                         name_native=self.name.native)
+            data |= dict(
+                name_user_preferred=self.name.userPreferred,
+                name_alternative=self.name.alternative,
+                name_native=self.name.native,
+            )
         if self.image:
             data |= dict(image_large=self.image.large)
         if self.dateOfBirth:
-            data |= dict(date_of_birth_year=self.dateOfBirth.year,
-                         date_of_birth_month=self.dateOfBirth.month,
-                         date_of_birth_day=self.dateOfBirth.day)
+            data |= dict(
+                date_of_birth_year=self.dateOfBirth.year,
+                date_of_birth_month=self.dateOfBirth.month,
+                date_of_birth_day=self.dateOfBirth.day,
+            )
         if self.dateOfDeath:
-            data |= dict(date_of_death_year=self.dateOfDeath.year,
-                         date_of_death_month=self.dateOfDeath.month,
-                         date_of_death_day=self.dateOfDeath.day)
+            data |= dict(
+                date_of_death_year=self.dateOfDeath.year,
+                date_of_death_month=self.dateOfDeath.month,
+                date_of_death_day=self.dateOfDeath.day,
+            )
         return data
 
 
@@ -185,11 +197,12 @@ class ALMediaEdge(BaseModel):
     characterRole: Optional[Literal['MAIN', 'SUPPORTING', 'BACKGROUND']] = None
 
     def to_edgedb(self):
-        sorted_va = sorted(self.voiceActors,
-                           key=lambda va: -(va.favourites or 0))
-        data = dict(media=self.node.to_edgedb(),
-                    voice_actors=[va.to_edgedb() for va in sorted_va],
-                    character_role=self.characterRole)
+        sorted_va = sorted(self.voiceActors, key=lambda va: -(va.favourites or 0))
+        data = dict(
+            media=self.node.to_edgedb(),
+            voice_actors=[va.to_edgedb() for va in sorted_va],
+            character_role=self.characterRole,
+        )
         return data
 
 
@@ -253,8 +266,9 @@ class ALCharacter(ALBaseModel):
             female = female_prog.findall(self.description)
             male = male_prog.findall(self.description)
 
-            if len(female) != len(male) and max(len(female),
-                                                len(male)) >= 3 * min(len(female), len(male)):
+            if len(female) != len(male) and max(len(female), len(male)) >= 3 * min(
+                len(female), len(male)
+            ):
                 return 'Female' if len(female) > len(male) else 'Male'
 
         return None
@@ -264,18 +278,23 @@ class ALCharacter(ALBaseModel):
         data |= dict(
             description=(self.description if self.description else None),
             gender=self.gender,
-            age=self.age)
+            age=self.age,
+        )
         if self.name is not None:
-            data |= dict(name_user_preferred=self.name.userPreferred,
-                         name_alternative=self.name.alternative,
-                         name_alternative_spoiler=self.name.alternativeSpoiler,
-                         name_native=self.name.native)
+            data |= dict(
+                name_user_preferred=self.name.userPreferred,
+                name_alternative=self.name.alternative,
+                name_alternative_spoiler=self.name.alternativeSpoiler,
+                name_native=self.name.native,
+            )
         if self.image is not None:
             data |= dict(image_large=self.image.large)
         if self.dateOfBirth is not None:
-            data |= dict(date_of_birth_year=self.dateOfBirth.year,
-                         date_of_birth_month=self.dateOfBirth.month,
-                         date_of_birth_day=self.dateOfBirth.day)
+            data |= dict(
+                date_of_birth_year=self.dateOfBirth.year,
+                date_of_birth_month=self.dateOfBirth.month,
+                date_of_birth_day=self.dateOfBirth.day,
+            )
         if include_computed:
             data |= dict(rank=self.rank, fuzzy_gender=self.fuzzy_gender)
         return data

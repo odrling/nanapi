@@ -24,17 +24,13 @@ async def upsert_discord_accounts(body: list[UpsertDiscordAccountBodyItem]):
 
 
 @router.oauth2.get('/profiles/search', response_model=list[ProfileSearchResult])
-async def profile_search(discord_ids: str | None = None,
-                         pattern: str | None = None):
+async def profile_search(discord_ids: str | None = None, pattern: str | None = None):
     if discord_ids is not None:
         try:
-            parsed = ([int(d_id) for d_id in discord_ids.split(',')]
-                      if len(discord_ids) > 0 else [])
+            parsed = [int(d_id) for d_id in discord_ids.split(',')] if len(discord_ids) > 0 else []
         except ValueError:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
-        return await profile_select_filter_discord_id(get_edgedb(),
-                                                      discord_ids=parsed)
+            raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
+        return await profile_select_filter_discord_id(get_edgedb(), discord_ids=parsed)
     if pattern is not None:
         return await profile_select_ilike(get_edgedb(), pattern=pattern)
 
@@ -42,7 +38,8 @@ async def profile_search(discord_ids: str | None = None,
 @router.oauth2.get(
     '/profiles/{discord_id}',
     response_model=ProfileSearchResult,
-    responses={status.HTTP_404_NOT_FOUND: dict(model=HTTPExceptionModel)})
+    responses={status.HTTP_404_NOT_FOUND: dict(model=HTTPExceptionModel)},
+)
 async def get_profile(discord_id: int):
     resp = await profile_get_by_discord_id(get_edgedb(), discord_id=discord_id)
     if resp is None:
@@ -50,9 +47,6 @@ async def get_profile(discord_id: int):
     return resp
 
 
-@router.oauth2.patch('/profiles/{discord_id}',
-                     response_model=ProfileSearchResult)
+@router.oauth2.patch('/profiles/{discord_id}', response_model=ProfileSearchResult)
 async def upsert_profile(discord_id: int, body: UpsertProfileBody):
-    return await profile_merge_select(get_edgedb(),
-                                      discord_id=discord_id,
-                                      **body.model_dump())
+    return await profile_merge_select(get_edgedb(), discord_id=discord_id, **body.model_dump())

@@ -16,8 +16,7 @@ router = NanAPIRouter(prefix='/clients', tags=['client'])
 
 
 @router.oauth2_client.get('/', response_model=WhoamiResponse)
-async def whoami(
-        current_user: ClientGetByUsernameResult = Depends(get_current_client)):
+async def whoami(current_user: ClientGetByUsernameResult = Depends(get_current_client)):
     return current_user
 
 
@@ -25,14 +24,15 @@ async def whoami(
     '/',
     response_model=ClientInsertResult,
     status_code=status.HTTP_201_CREATED,
-    responses={status.HTTP_409_CONFLICT: dict(model=HTTPExceptionModel)})
+    responses={status.HTTP_409_CONFLICT: dict(model=HTTPExceptionModel)},
+)
 async def register(body: NewClientBody):
     password = body.password
     password_hash = get_password_hash(password)
     try:
-        return await client_insert(get_edgedb(),
-                                   username=body.username,
-                                   password_hash=password_hash)
+        return await client_insert(
+            get_edgedb(), username=body.username, password_hash=password_hash
+        )
     except ConstraintViolationError as e:
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=str(e))
 
@@ -41,7 +41,8 @@ async def register(body: NewClientBody):
     '/token',
     response_model=LoginResponse,
     status_code=status.HTTP_201_CREATED,
-    responses={status.HTTP_401_UNAUTHORIZED: dict(model=HTTPExceptionModel)})
+    responses={status.HTTP_401_UNAUTHORIZED: dict(model=HTTPExceptionModel)},
+)
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     client = await authenticate_client(form_data.username, form_data.password)
     if not client:
@@ -51,6 +52,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
             headers={'WWW-Authenticate': 'Bearer'},
         )
     access_token_expires = timedelta(minutes=JWT_EXPIRE_MINUTES)
-    access_token = create_access_token(data=dict(sub=client.username),
-                                       expires_delta=access_token_expires)
+    access_token = create_access_token(
+        data=dict(sub=client.username), expires_delta=access_token_expires
+    )
     return dict(token_type='bearer', access_token=access_token)

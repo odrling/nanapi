@@ -15,10 +15,10 @@ logger = logging.getLogger(__name__)
 
 
 def make_redis_key(key: str):
-    return f"{INSTANCE_NAME}_{key}"
+    return f'{INSTANCE_NAME}_{key}'
 
 
-T = TypeVar("T")
+T = TypeVar('T')
 
 
 class BaseRedis(ABC, Generic[T]):
@@ -28,7 +28,7 @@ class BaseRedis(ABC, Generic[T]):
         self.key = key if global_key else make_redis_key(key)
 
     async def get(self, sub_key: str | int | None = None) -> T | None:
-        key = self.key if sub_key is None else f"{self.key}:{sub_key}"
+        key = self.key if sub_key is None else f'{self.key}:{sub_key}'
         try:
             resp = await data_get_by_key(get_edgedb(), key=key)
             return self._decode(resp)
@@ -37,7 +37,7 @@ class BaseRedis(ABC, Generic[T]):
             return
 
     async def set(self, value: T, sub_key: str | int | None = None, **kwargs):
-        key = self.key if sub_key is None else f"{self.key}:{sub_key}"
+        key = self.key if sub_key is None else f'{self.key}:{sub_key}'
         encoded_value = self.encode(value)
         try:
             await data_merge(get_edgedb(), key=key, value=encoded_value)
@@ -46,19 +46,17 @@ class BaseRedis(ABC, Generic[T]):
             return
 
     async def delete(self, sub_key: str | int | None = None):
-        key = self.key if sub_key is None else f"{self.key}:{sub_key}"
+        key = self.key if sub_key is None else f'{self.key}:{sub_key}'
         await data_delete_by_key(get_edgedb(), key=key)
 
     async def get_all(self):
-        resp = await data_select_key_ilike(get_edgedb(),
-                                           pattern=f"{self.key}:%")
+        resp = await data_select_key_ilike(get_edgedb(), pattern=f'{self.key}:%')
         for item in resp:
-            *_, sub_key = item.key.rpartition(":")
+            *_, sub_key = item.key.rpartition(':')
             yield sub_key, await self.get(sub_key)
 
     @abstractmethod
-    def encode(self, value: T) -> str:
-        ...
+    def encode(self, value: T) -> str: ...
 
     def _decode(self, resp: DataGetByKeyResult | None) -> T | None:
         if resp is None:
@@ -66,12 +64,10 @@ class BaseRedis(ABC, Generic[T]):
         return self.decode(resp.value)
 
     @abstractmethod
-    def decode(self, value: str) -> T:
-        ...
+    def decode(self, value: str) -> T: ...
 
 
 class StringValue(BaseRedis[str]):
-
     def encode(self, value: str) -> str:
         return value
 
@@ -80,7 +76,6 @@ class StringValue(BaseRedis[str]):
 
 
 class _IntegerValueMixin:
-
     def encode(self, value: int) -> str:
         return str(value)
 
@@ -93,7 +88,6 @@ class IntegerValue(_IntegerValueMixin, BaseRedis[int]):
 
 
 class FloatValue(BaseRedis[float]):
-
     def encode(self, value: float) -> str:
         return str(value)
 
@@ -102,11 +96,7 @@ class FloatValue(BaseRedis[float]):
 
 
 class BooleanValue(_IntegerValueMixin, BaseRedis[bool]):
-
-    def __init__(self,
-                 key: str,
-                 global_key: bool = False,
-                 default: bool = False):
+    def __init__(self, key: str, global_key: bool = False, default: bool = False):
         super().__init__(key, global_key)
         self.default = default
 
@@ -123,7 +113,6 @@ class BooleanValue(_IntegerValueMixin, BaseRedis[bool]):
 
 
 class JSONValue(BaseRedis[Any]):
-
     def __init__(self, key: str, global_key: bool = False, **orjson_kwargs):
         super().__init__(key, global_key)
         self.orjson_kwargs = orjson_kwargs

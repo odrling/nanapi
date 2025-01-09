@@ -18,8 +18,7 @@ logger = logging.getLogger(__name__)
 @webhook_exceptions
 async def refresh_tags():
     tags = await get_tags(al_low_priority=True)
-    await tag_merge_multiple(get_edgedb(),
-                             tags=[tag.to_edgedb() for tag in tags])
+    await tag_merge_multiple(get_edgedb(), tags=[tag.to_edgedb() for tag in tags])
 
 
 @webhook_exceptions
@@ -35,13 +34,12 @@ async def refresh_medias():
 
     parts = list(batched(orphan_medias, 50))
     logger.info(
-        f"refresh_medias: fetching page 1 for {len(orphan_medias)} orphans medias "
-        f"in {len(parts)} requests")
+        f'refresh_medias: fetching page 1 for {len(orphan_medias)} orphans medias '
+        f'in {len(parts)} requests'
+    )
     tasks = (Media.fetch_page(set(p), 1, low_priority=True) for p in parts)
     await asyncio.gather(*tasks)
-    logger.info(
-        f"refresh_medias: page 1 fetched for {len(orphan_medias)} orphans medias"
-    )
+    logger.info(f'refresh_medias: page 1 fetched for {len(orphan_medias)} orphans medias')
 
     await refresh_multitons.edgedb_merge_medias(get_edgedb(), full=True)
     refresh_multitons.medias.clear()
@@ -74,18 +72,18 @@ async def refresh_staffs():
 
 
 async def main():
-    logger.info("refreshing tags")
+    logger.info('refreshing tags')
     await refresh_tags()
-    logger.info("refreshing lists")
+    logger.info('refreshing lists')
     await refresh_lists()
-    logger.info("refreshing medias")
+    logger.info('refreshing medias')
     await refresh_medias()
-    logger.info("refreshing charas")
+    logger.info('refreshing charas')
     await refresh_charas()
-    logger.info("refreshing staffs")
+    logger.info('refreshing staffs')
     await refresh_staffs()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     logging.basicConfig(level=LOG_LEVEL)
     asyncio.run(main())

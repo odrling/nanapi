@@ -62,7 +62,8 @@ favourites
 siteUrl
 """
 
-media_fields = """
+media_fields = (
+    """
 %s
 type
 idMal
@@ -90,9 +91,12 @@ tags {
     id
     rank
 }
-""" % base_fields
+"""
+    % base_fields
+)
 
-chara_fields = """
+chara_fields = (
+    """
 %s
 name {
     userPreferred
@@ -111,9 +115,12 @@ dateOfBirth {
     day
 }
 age
-""" % base_fields
+"""
+    % base_fields
+)
 
-staff_fields = """
+staff_fields = (
+    """
 %s
 name {
     userPreferred
@@ -136,7 +143,9 @@ dateOfDeath {
     day
 }
 age
-""" % base_fields
+"""
+    % base_fields
+)
 
 tag_fields = """
 id
@@ -148,9 +157,8 @@ isAdult
 
 
 class ALRateLimit(Exception):
-
     def __init__(self, reset_at: int):
-        super().__init__(f"Rate limited until {reset_at}")
+        super().__init__(f'Rate limited until {reset_at}')
         self.reset_at = reset_at
 
     @property
@@ -175,7 +183,7 @@ class ALAPI:
         loop = asyncio.get_running_loop()
         while self.last_request_time + 60 > loop.time():
             wait_time = (self.last_request_time + 60) - loop.time()
-            logger.debug(f"ALAPI reset: sleeping for {wait_time:.2f}s")
+            logger.debug(f'ALAPI reset: sleeping for {wait_time:.2f}s')
             await asyncio.sleep(wait_time)
 
         self.remaining = ALAPI.RATE_LIMIT
@@ -209,7 +217,7 @@ class ALAPI:
     @remaining.setter
     def remaining(self, value):
         value = int(value)
-        logger.debug(f"ALAPI rate limit: {value} remaining requests")
+        logger.debug(f'ALAPI rate limit: {value} remaining requests')
         self._remaining = value
         if value > LOW_PRIORITY_THRESH:
             self.low_priority_ready.set()
@@ -221,20 +229,21 @@ class ALAPI:
         if self.reset_task is None or self.reset_task.done():
             self.reset_task = asyncio.create_task(self.reset())
 
-    async def _call(self,
-                    json_query: bytes,
-                    raise_rate_limit=False,
-                    timeout: aiohttp.ClientTimeout | None = None):
+    async def _call(
+        self,
+        json_query: bytes,
+        raise_rate_limit=False,
+        timeout: aiohttp.ClientTimeout | None = None,
+    ):
         while True:
             try:
                 if self.reset_at > time.time():
                     raise ALRateLimit(self.reset_at)
 
-                headers = {'Content-Type': "application/json"}
-                async with get_session().post(AL_URL,
-                                              timeout=timeout,
-                                              data=json_query,
-                                              headers=headers) as resp:
+                headers = {'Content-Type': 'application/json'}
+                async with get_session().post(
+                    AL_URL, timeout=timeout, data=json_query, headers=headers
+                ) as resp:
                     if 'X-RateLimit-Remaining' in resp.headers:
                         self.remaining = resp.headers['X-RateLimit-Remaining']
                     if reset_at := resp.headers.get('X-RateLimit-Reset'):
@@ -265,20 +274,20 @@ class ALAPI:
                 if raise_rate_limit:
                     raise
                 else:
-                    logger.debug(
-                        f"ALAPI rate limit: reached, sleep for {self.reset_in:.2f}s"
-                    )
+                    logger.debug(f'ALAPI rate limit: reached, sleep for {self.reset_in:.2f}s')
                     await asyncio.sleep(self.reset_in)
 
     @default_backoff
-    async def __call__(self,
-                       json: dict[str, Any],
-                       raise_rate_limit=False,
-                       low_priority=False,
-                       timeout: aiohttp.ClientTimeout | None = None):
+    async def __call__(
+        self,
+        json: dict[str, Any],
+        raise_rate_limit=False,
+        low_priority=False,
+        timeout: aiohttp.ClientTimeout | None = None,
+    ):
         json_query = orjson.dumps(json)
 
-        logger.debug(f"ALAPI call: {low_priority=}")
+        logger.debug(f'ALAPI call: {low_priority=}')
 
         if low_priority:
             async with self.low_priority_semaphore:
@@ -300,7 +309,6 @@ anilist_api = ALAPI()
 
 
 class MALMapper(dict):
-
     def __init__(self):
         super().__init__()
         for k in MediaType:
@@ -325,23 +333,25 @@ class Userlist:
         self.username = username
 
     async def refresh(
-            self,
-            media_type: MediaType,
-            al_low_priority: bool = False) -> tuple[list[dict], set[ALMedia]]:
+        self, media_type: MediaType, al_low_priority: bool = False
+    ) -> tuple[list[dict], set[ALMedia]]:
         return [], set()
 
-    def to_edgedb(self, media_type: MediaType, entries: list[dict],
-                  medias: set[ALMedia]) -> dict[str, Any]:
+    def to_edgedb(
+        self, media_type: MediaType, entries: list[dict], medias: set[ALMedia]
+    ) -> dict[str, Any]:
         nodes = [m.to_edgedb() for m in medias]
-        edgedb_data = dict(medias=nodes,
-                           service=self.service.value,
-                           username=self.username,
-                           type=media_type.value,
-                           entries=entries)
+        edgedb_data = dict(
+            medias=nodes,
+            service=self.service.value,
+            username=self.username,
+            type=media_type.value,
+            entries=entries,
+        )
         return edgedb_data
 
     def __str__(self):
-        return f"<{self.__class__.__name__} {self.username=}>"
+        return f'<{self.__class__.__name__} {self.username=}>'
 
     __repr__ = __str__
 
@@ -360,10 +370,13 @@ class ALUserlist(Userlist):
         for entry in entries:
             almedia = ALMedia.model_validate(entry['media'])
             new_entries.append(
-                dict(id_al=almedia.id,
-                     status=entry['status'],
-                     progress=entry['progress'],
-                     score=entry['score']))
+                dict(
+                    id_al=almedia.id,
+                    status=entry['status'],
+                    progress=entry['progress'],
+                    score=entry['score'],
+                )
+            )
             new_medias.add(almedia)
 
         return new_entries, new_medias
@@ -397,22 +410,17 @@ class ALUserlist(Userlist):
         }
 
         jsonData = await anilist_api(
-            {
-                'query': query,
-                'variables': variables
-            },
+            {'query': query, 'variables': variables},
             timeout=aiohttp.ClientTimeout(total=300),
             low_priority=al_low_priority,
         )
 
-        entries = concat(
-            l['entries']
-            for l in jsonData['data']['MediaListCollection']['lists'])
+        entries = concat(l['entries'] for l in jsonData['data']['MediaListCollection']['lists'])
 
         return entries
 
     def __str__(self):
-        return f"https://anilist.co/user/{self.username}"
+        return f'https://anilist.co/user/{self.username}'
 
 
 class MALUserlist(Userlist):
@@ -441,47 +449,50 @@ class MALUserlist(Userlist):
                 logger.error(e)
                 await asyncio.sleep(1)
         else:
-            logger.error(f"MALUserlist: refresh failed for {self.username}")
+            logger.error(f'MALUserlist: refresh failed for {self.username}')
             return [], set()
 
         al_ids, new_medias = await self.get_al_ids(
-            media_type,
-            set(entry.node.id for entry in userlist),
-            low_priority=al_low_priority)
+            media_type, set(entry.node.id for entry in userlist), low_priority=al_low_priority
+        )
 
         new_entries = []
         for entry in userlist:
             if entry.node.id is not None:
-                repeating = (entry.list_status.is_rewatching
-                             if media_type == MediaType.ANIME else
-                             entry.list_status.is_rereading)
-                status = ('REPEATING' if repeating else
-                          self.MAL_STATUS[entry.list_status.status])
+                repeating = (
+                    entry.list_status.is_rewatching
+                    if media_type == MediaType.ANIME
+                    else entry.list_status.is_rereading
+                )
+                status = 'REPEATING' if repeating else self.MAL_STATUS[entry.list_status.status]
 
-                progress = (entry.list_status.num_episodes_watched
-                            if media_type is MediaType.ANIME else
-                            entry.list_status.num_chapters_read)
+                progress = (
+                    entry.list_status.num_episodes_watched
+                    if media_type is MediaType.ANIME
+                    else entry.list_status.num_chapters_read
+                )
 
-                if (id_al := al_ids.get(entry.node.id, None)):
+                if id_al := al_ids.get(entry.node.id, None):
                     new_entries.append(
-                        dict(id_al=id_al,
-                             status=status,
-                             progress=progress,
-                             score=entry.list_status.score))
+                        dict(
+                            id_al=id_al,
+                            status=status,
+                            progress=progress,
+                            score=entry.list_status.score,
+                        )
+                    )
 
         return new_entries, new_medias
 
     @classmethod
     async def fetch_list(cls, username: str, media_type: MediaType):
         async with cls.refresh_lock:
-            url = f"https://api.myanimelist.net/v2/users/{username}/{media_type.lower()}list"
+            url = f'https://api.myanimelist.net/v2/users/{username}/{media_type.lower()}list'
             headers = {'X-MAL-CLIENT-ID': MAL_CLIENT_ID}
             entries: list[MALListRespDataEntry] = []
             for offset in count(0, 1000):
                 params = dict(limit=1000, offset=offset, fields='list_status')
-                async with get_session().get(url,
-                                             params=params,
-                                             headers=headers) as resp:
+                async with get_session().get(url, params=params, headers=headers) as resp:
                     resp.raise_for_status()
 
                     try:
@@ -499,14 +510,9 @@ class MALUserlist(Userlist):
 
     @classmethod
     async def get_al_ids(
-        cls,
-        media_type: MediaType,
-        ids_mal: set[int],
-        low_priority: bool = False
+        cls, media_type: MediaType, ids_mal: set[int], low_priority: bool = False
     ) -> tuple[dict[int, int | None], set[ALMedia]]:
-        to_fetch = [
-            id_mal for id_mal in ids_mal if id_mal not in malmapper[media_type]
-        ]
+        to_fetch = [id_mal for id_mal in ids_mal if id_mal not in malmapper[media_type]]
 
         new_medias = set()
         if to_fetch:
@@ -532,28 +538,22 @@ class MALUserlist(Userlist):
                 }
                 try:
                     jsonData = await anilist_api(
-                        {
-                            'query': query,
-                            'variables': variables
-                        },
-                        low_priority=low_priority)
+                        {'query': query, 'variables': variables}, low_priority=low_priority
+                    )
                     for entry in jsonData['data']['Page']['media']:
                         almedia = ALMedia.model_validate(entry)
                         new_medias.add(almedia)
                 except aiohttp.ClientResponseError as e:
                     if e.status == 404:
-                        msg = f"MAL ids {ids_mal} not found on AniList"
+                        msg = f'MAL ids {ids_mal} not found on AniList'
                         logger.info(msg)
                     else:
                         raise
 
-        return {
-            id_mal: malmapper[media_type].get(id_mal, None)
-            for id_mal in ids_mal
-        }, new_medias
+        return {id_mal: malmapper[media_type].get(id_mal, None) for id_mal in ids_mal}, new_medias
 
     def __str__(self):
-        return f"https://myanimelist.net/profile/{self.username}"
+        return f'https://myanimelist.net/profile/{self.username}'
 
 
 SERVICE_USER_LIST: dict[AnilistService, Type[Userlist]] = {
@@ -563,17 +563,18 @@ SERVICE_USER_LIST: dict[AnilistService, Type[Userlist]] = {
 
 
 async def get_tags(al_low_priority: bool = False) -> list[MediaTag]:
-    query = """
+    query = (
+        """
     query {
         MediaTagCollection {
             %s
         }
     }
-    """ % tag_fields
-    jsonData = await anilist_api(dict(query=query),
-                                 low_priority=al_low_priority)
-    tags = TypeAdapter(list[MediaTag]).validate_python(
-        jsonData['data']['MediaTagCollection'])
+    """
+        % tag_fields
+    )
+    jsonData = await anilist_api(dict(query=query), low_priority=al_low_priority)
+    tags = TypeAdapter(list[MediaTag]).validate_python(jsonData['data']['MediaTagCollection'])
     return tags
 
 
@@ -587,88 +588,70 @@ class ALMultitons:
     staffs: dict[int, 'Staff'] = field(default_factory=dict)
     name: str | None = None
 
-    async def edgedb_merge(self,
-                           executor: AsyncIOExecutor,
-                           full: bool = False,
-                           low_priority=True):
-        await self.edgedb_merge_medias(executor,
-                                       full=full,
-                                       low_priority=low_priority)
-        await self.edgedb_merge_charas(executor,
-                                       full=full,
-                                       low_priority=low_priority)
-        await self.edgedb_merge_staffs(executor,
-                                       full=full,
-                                       low_priority=low_priority)
+    async def edgedb_merge(self, executor: AsyncIOExecutor, full: bool = False, low_priority=True):
+        await self.edgedb_merge_medias(executor, full=full, low_priority=low_priority)
+        await self.edgedb_merge_charas(executor, full=full, low_priority=low_priority)
+        await self.edgedb_merge_staffs(executor, full=full, low_priority=low_priority)
 
-    async def edgedb_merge_medias(self,
-                                  executor: AsyncIOExecutor,
-                                  full: bool = False,
-                                  low_priority: bool = True):
+    async def edgedb_merge_medias(
+        self, executor: AsyncIOExecutor, full: bool = False, low_priority: bool = True
+    ):
         async with merge_lock:
             medias = set(self.medias.values())
-            logger.info(f"{self!r}: merging medias")
+            logger.info(f'{self!r}: merging medias')
             i = 0
             failed = []
-            async for m in Media.load(medias,
-                                      full=full,
-                                      low_priority=low_priority):
+            async for m in Media.load(medias, full=full, low_priority=low_priority):
                 try:
                     await m.edgedb_merge(executor)
                     del self.medias[m.id]
                     i += 1
-                    logger.debug(f"{self!r}: merged {i}/{len(medias)} medias, {failed=!r}")
+                    logger.debug(f'{self!r}: merged {i}/{len(medias)} medias, {failed=!r}')
                 except Exception as e:
                     failed.append(m.id)
-                    logger.error(f"{self!r}: Media[{m.id}] failed to merge")
+                    logger.error(f'{self!r}: Media[{m.id}] failed to merge')
                     logger.exception(e)
-            logger.info(f"{self!r}: merge finished at {i}/{len(medias)} medias")
+            logger.info(f'{self!r}: merge finished at {i}/{len(medias)} medias')
 
-    async def edgedb_merge_charas(self,
-                                  executor: AsyncIOExecutor,
-                                  full: bool = False,
-                                  low_priority: bool = True):
+    async def edgedb_merge_charas(
+        self, executor: AsyncIOExecutor, full: bool = False, low_priority: bool = True
+    ):
         async with merge_lock:
             charas = set(self.charas.values())
-            logger.info(f"{self!r}: merging charas")
+            logger.info(f'{self!r}: merging charas')
             i = 0
             failed = []
-            async for c in Chara.load(charas,
-                                      full=full,
-                                      low_priority=low_priority):
+            async for c in Chara.load(charas, full=full, low_priority=low_priority):
                 try:
                     await c.edgedb_merge(executor)
                     del self.charas[c.id]
                     i += 1
-                    logger.debug(f"{self!r}: merged {i}/{len(charas)} charas, {failed=!r}")
+                    logger.debug(f'{self!r}: merged {i}/{len(charas)} charas, {failed=!r}')
                 except Exception as e:
                     failed.append(c.id)
-                    logger.error(f"{self!r}: Chara[{c.id}] failed to merge")
+                    logger.error(f'{self!r}: Chara[{c.id}] failed to merge')
                     logger.exception(e)
-            logger.info(f"{self!r}: merge finished at {i}/{len(charas)} charas")
+            logger.info(f'{self!r}: merge finished at {i}/{len(charas)} charas')
 
-    async def edgedb_merge_staffs(self,
-                                  executor: AsyncIOExecutor,
-                                  full: bool = False,
-                                  low_priority: bool = True):
+    async def edgedb_merge_staffs(
+        self, executor: AsyncIOExecutor, full: bool = False, low_priority: bool = True
+    ):
         async with merge_lock:
             staffs = set(self.staffs.values())
-            logger.info(f"{self!r}: merging staffs")
+            logger.info(f'{self!r}: merging staffs')
             i = 0
             failed = []
-            async for s in Staff.load(staffs,
-                                      full=full,
-                                      low_priority=low_priority):
+            async for s in Staff.load(staffs, full=full, low_priority=low_priority):
                 try:
                     await s.edgedb_merge(executor)
                     del self.staffs[s.id]
                     i += 1
-                    logger.debug(f"{self!r}: merged {i}/{len(staffs)} staffs, {failed=!r}")
+                    logger.debug(f'{self!r}: merged {i}/{len(staffs)} staffs, {failed=!r}')
                 except Exception as e:
                     failed.append(s.id)
-                    logger.error(f"{self!r}: Staff[{s.id}] failed to merge")
+                    logger.error(f'{self!r}: Staff[{s.id}] failed to merge')
                     logger.exception(e)
-            logger.info(f"{self!r}: merge finished at {i}/{len(staffs)} staffs")
+            logger.info(f'{self!r}: merge finished at {i}/{len(staffs)} staffs')
 
     def clear_all(self):
         self.medias.clear()
@@ -676,8 +659,10 @@ class ALMultitons:
         self.staffs.clear()
 
     def __repr__(self) -> str:
-        return (f"<ALMultitons {self.name=} "
-                f"{len(self.medias)=} {len(self.charas)=} {len(self.staffs)=}>")
+        return (
+            f'<ALMultitons {self.name=} '
+            f'{len(self.medias)=} {len(self.charas)=} {len(self.staffs)=}>'
+        )
 
 
 merge_lock = asyncio.Lock()
@@ -698,7 +683,7 @@ class ALEntity(ABC, Generic[T]):
     @property
     def aldata(self) -> T:
         if self._aldata is None:
-            raise RuntimeError("Not loaded")
+            raise RuntimeError('Not loaded')
         return self._aldata
 
     @property
@@ -708,12 +693,10 @@ class ALEntity(ABC, Generic[T]):
         return self.last_pageinfo.currentPage
 
     @abstractmethod
-    def feed_page(self, value: T) -> None:
-        ...
+    def feed_page(self, value: T) -> None: ...
 
     @abstractmethod
-    async def edgedb_merge(self, executor: AsyncIOExecutor) -> None:
-        ...
+    async def edgedb_merge(self, executor: AsyncIOExecutor) -> None: ...
 
     def __hash__(self) -> int:
         return hash((self.id, self.complete.is_set()))
@@ -721,7 +704,7 @@ class ALEntity(ABC, Generic[T]):
     @classmethod
     def get(cls, multitons: ALMultitons, id: int) -> Self:
         if id is None:
-            raise TypeError("id cannot be None")
+            raise TypeError('id cannot be None')
 
         if id not in getattr(multitons, cls.ALMULTITONS_KEY):
             getattr(multitons, cls.ALMULTITONS_KEY)[id] = cls(multitons, id)
@@ -730,20 +713,15 @@ class ALEntity(ABC, Generic[T]):
 
     @classmethod
     @abstractmethod
-    async def fetch_page(cls,
-                         items: set[Self],
-                         page: int,
-                         low_priority: bool = False) -> set[Self]:
-        ...
+    async def fetch_page(
+        cls, items: set[Self], page: int, low_priority: bool = False
+    ) -> set[Self]: ...
 
     @classmethod
     @abstractmethod
-    async def load(cls,
-                   items: set[Self],
-                   full: bool = True,
-                   low_priority=False,
-                   _start_page: int = 1) -> Generator[Self, None, None]:
-        ...
+    async def load(
+        cls, items: set[Self], full: bool = True, low_priority=False, _start_page: int = 1
+    ) -> Generator[Self, None, None]: ...
 
 
 def is_complete(d: ALEntity) -> bool:
@@ -782,25 +760,20 @@ class Media(ALEntity[ALMedia]):
                     chara.feed_page(charaData)
                     self.characters.add(chara)
 
-                if (not self.last_pageinfo.hasNextPage or
-                        len(value.characters.nodes) == 0):
+                if not self.last_pageinfo.hasNextPage or len(value.characters.nodes) == 0:
                     self.complete.set()
 
     async def edgedb_merge(self, executor: AsyncIOExecutor):
         media_data = self.aldata.to_edgedb()
         charas_datas = [chara.aldata.to_edgedb() for chara in self.characters]
 
-        logger.debug(
-            f"Media[{self.id}]: merging with {len(charas_datas)} charas")
-        await media_merge_combined_charas(executor,
-                                          media=media_data,
-                                          characters=charas_datas)
+        logger.debug(f'Media[{self.id}]: merging with {len(charas_datas)} charas')
+        await media_merge_combined_charas(executor, media=media_data, characters=charas_datas)
 
     @classmethod
-    async def fetch_page(cls,
-                         items: set['Media'],
-                         page: int,
-                         low_priority: bool = False) -> set['Media']:
+    async def fetch_page(
+        cls, items: set['Media'], page: int, low_priority: bool = False
+    ) -> set['Media']:
         medias_dict = {m.id: m for m in items}
         found = set()
 
@@ -844,11 +817,9 @@ class Media(ALEntity[ALMedia]):
         return found
 
     @classmethod
-    async def load(cls,
-                   items: set['Media'],
-                   full: bool = True,
-                   low_priority=False,
-                   _start_page: int = 1):
+    async def load(
+        cls, items: set['Media'], full: bool = True, low_priority=False, _start_page: int = 1
+    ):
         complete: set[Media] = set(filter(is_complete, items))
         not_complete: set[Media] = set(filterfalse(is_complete, items))
 
@@ -861,14 +832,13 @@ class Media(ALEntity[ALMedia]):
 
             parts = list(batched(not_complete, 50))
             logger.info(
-                f"Media.load: fetching page {page} for {len(not_complete)} medias "
-                f"in {len(parts)} requests")
+                f'Media.load: fetching page {page} for {len(not_complete)} medias '
+                f'in {len(parts)} requests'
+            )
 
             not_complete = set()
             for part in parts:
-                fetched = await cls.fetch_page(set(part),
-                                               page,
-                                               low_priority=low_priority)
+                fetched = await cls.fetch_page(set(part), page, low_priority=low_priority)
                 for m in fetched:
                     if is_complete(m) or not full:
                         yield m
@@ -911,8 +881,7 @@ class Chara(ALEntity[ALCharacter]):
                         staff.feed_page(va)
                         self.staffs.add(staff)
 
-                if (not value.media.pageInfo.hasNextPage or
-                        len(value.media.edges) == 0):
+                if not value.media.pageInfo.hasNextPage or len(value.media.edges) == 0:
                     self.complete.set()
 
     async def edgedb_merge(self, executor: AsyncIOExecutor):
@@ -920,31 +889,38 @@ class Chara(ALEntity[ALCharacter]):
         medias_data = [media.aldata.to_edgedb() for media in self.medias]
         staffs_data = [staff.aldata.to_edgedb() for staff in self.staffs]
         edges_data = [
-            dict(character_id=self.id,
-                 media_id=edge.node.id,
-                 voice_actor_ids=[va.id for va in edge.voiceActors],
-                 character_role=edge.characterRole) for edge in self.edges
+            dict(
+                character_id=self.id,
+                media_id=edge.node.id,
+                voice_actor_ids=[va.id for va in edge.voiceActors],
+                character_role=edge.characterRole,
+            )
+            for edge in self.edges
         ]
 
-        logger.debug(f"Chara[{self.id}]: merging with "
-                     f"{len(medias_data)} medias, {len(staffs_data)} staffs "
-                     f"and {len(edges_data)} edges")
+        logger.debug(
+            f'Chara[{self.id}]: merging with '
+            f'{len(medias_data)} medias, {len(staffs_data)} staffs '
+            f'and {len(edges_data)} edges'
+        )
         # Narrator fix
         if self.current_page > 20:
-            await edgedb_split_merge(executor, medias_data, [character_data],
-                                     staffs_data, edges_data)
+            await edgedb_split_merge(
+                executor, medias_data, [character_data], staffs_data, edges_data
+            )
         else:
-            await c_edge_merge_combined_by_chara(executor,
-                                                 character=character_data,
-                                                 medias=medias_data,
-                                                 staffs=staffs_data,
-                                                 edges=edges_data)
+            await c_edge_merge_combined_by_chara(
+                executor,
+                character=character_data,
+                medias=medias_data,
+                staffs=staffs_data,
+                edges=edges_data,
+            )
 
     @classmethod
-    async def fetch_page(cls,
-                         items: set['Chara'],
-                         page: int,
-                         low_priority: bool = False) -> set['Chara']:
+    async def fetch_page(
+        cls, items: set['Chara'], page: int, low_priority: bool = False
+    ) -> set['Chara']:
         charas_dict = {c.id: c for c in items}
         found = set()
 
@@ -968,8 +944,7 @@ class Chara(ALEntity[ALCharacter]):
                 }
             }
         }
-        """ % (chara_fields if page == 1 else 'id', page_info, media_fields,
-               staff_fields)
+        """ % (chara_fields if page == 1 else 'id', page_info, media_fields, staff_fields)
         variables = dict(idIn=[chara.id for chara in items], page=page)
 
         try:
@@ -995,11 +970,9 @@ class Chara(ALEntity[ALCharacter]):
         return found
 
     @classmethod
-    async def load(cls,
-                   items: set['Chara'],
-                   full: bool = True,
-                   low_priority=False,
-                   _start_page: int = 1):
+    async def load(
+        cls, items: set['Chara'], full: bool = True, low_priority=False, _start_page: int = 1
+    ):
         complete: set[Chara] = set(filter(is_complete, items))
         not_complete: set[Chara] = set(filterfalse(is_complete, items))
 
@@ -1012,14 +985,13 @@ class Chara(ALEntity[ALCharacter]):
 
             parts = list(batched(not_complete, 50))
             logger.info(
-                f"Chara.load: fetching page {page} for {len(not_complete)} charas "
-                f"in {len(parts)} requests")
+                f'Chara.load: fetching page {page} for {len(not_complete)} charas '
+                f'in {len(parts)} requests'
+            )
 
             not_complete = set()
             for part in parts:
-                fetched = await cls.fetch_page(set(part),
-                                               page,
-                                               low_priority=low_priority)
+                fetched = await cls.fetch_page(set(part), page, low_priority=low_priority)
                 for c in fetched:
                     if is_complete(c) or not full:
                         yield c
@@ -1059,30 +1031,26 @@ class Staff(ALEntity[ALStaff]):
                     chara.feed_page(edge.node)
                     self.characters.add(chara)
 
-                if (not value.characters.pageInfo.hasNextPage or
-                        len(value.characters.edges) == 0):
+                if not value.characters.pageInfo.hasNextPage or len(value.characters.edges) == 0:
                     self.complete.set()
 
     async def edgedb_merge(self, executor: AsyncIOExecutor):
         staff_data = self.aldata.to_edgedb()
         medias_data = [media.aldata.to_edgedb() for media in self.medias]
-        characters_data = [
-            chara.aldata.to_edgedb() for chara in self.characters
-        ]
+        characters_data = [chara.aldata.to_edgedb() for chara in self.characters]
 
         logger.debug(
-            f"Staff[{self.id}]: merging with "
-            f"{len(medias_data)} medias and {len(characters_data)} charas")
-        await staff_merge_combined_medias_charas(executor,
-                                                 staff=staff_data,
-                                                 medias=medias_data,
-                                                 characters=characters_data)
+            f'Staff[{self.id}]: merging with '
+            f'{len(medias_data)} medias and {len(characters_data)} charas'
+        )
+        await staff_merge_combined_medias_charas(
+            executor, staff=staff_data, medias=medias_data, characters=characters_data
+        )
 
     @classmethod
-    async def fetch_page(cls,
-                         items: set['Staff'],
-                         page: int,
-                         low_priority: bool = False) -> set['Staff']:
+    async def fetch_page(
+        cls, items: set['Staff'], page: int, low_priority: bool = False
+    ) -> set['Staff']:
         staffs_dict = {s.id: s for s in items}
         found = set()
 
@@ -1105,8 +1073,7 @@ class Staff(ALEntity[ALStaff]):
                 }
             }
         }
-        """ % (staff_fields if page == 1 else 'id', page_info, chara_fields,
-               media_fields)
+        """ % (staff_fields if page == 1 else 'id', page_info, chara_fields, media_fields)
         variables = dict(idIn=[staff.id for staff in items], page=page)
 
         try:
@@ -1132,11 +1099,9 @@ class Staff(ALEntity[ALStaff]):
         return found
 
     @classmethod
-    async def load(cls,
-                   items: set['Staff'],
-                   full: bool = True,
-                   low_priority=False,
-                   _start_page: int = 1):
+    async def load(
+        cls, items: set['Staff'], full: bool = True, low_priority=False, _start_page: int = 1
+    ):
         complete: set[Staff] = set(filter(is_complete, items))
         not_complete: set[Staff] = set(filterfalse(is_complete, items))
 
@@ -1149,14 +1114,13 @@ class Staff(ALEntity[ALStaff]):
 
             parts = list(batched(not_complete, 50))
             logger.info(
-                f"Staff.load: fetching page {page} for {len(not_complete)} staffs "
-                f"in {len(parts)} requests")
+                f'Staff.load: fetching page {page} for {len(not_complete)} staffs '
+                f'in {len(parts)} requests'
+            )
 
             not_complete = set()
             for part in parts:
-                fetched = await cls.fetch_page(set(part),
-                                               page,
-                                               low_priority=low_priority)
+                fetched = await cls.fetch_page(set(part), page, low_priority=low_priority)
                 for s in fetched:
                     if is_complete(s) or not full:
                         yield s
@@ -1164,8 +1128,9 @@ class Staff(ALEntity[ALStaff]):
                         not_complete.add(s)
 
 
-async def edgedb_split_merge(executor: AsyncIOExecutor, medias: list,
-                             characters: list, staffs: list, edges: list):
+async def edgedb_split_merge(
+    executor: AsyncIOExecutor, medias: list, characters: list, staffs: list, edges: list
+):
     for part in batched(medias, MERGE_COMBINED_MAX_SIZE):
         await media_merge_multiple(executor, medias=part)
     for part in batched(characters, MERGE_COMBINED_MAX_SIZE):

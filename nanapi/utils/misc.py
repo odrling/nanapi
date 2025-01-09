@@ -14,22 +14,17 @@ from nanapi.utils.clients import get_session
 
 conn_backoff = backoff.on_exception(
     backoff.expo,
-    (aiohttp.ClientConnectorError, aiohttp.ClientConnectionError,
-     aiohttp.ContentTypeError),
+    (aiohttp.ClientConnectorError, aiohttp.ClientConnectionError, aiohttp.ContentTypeError),
     max_time=600,
 )
 giveup = lambda exception: 400 <= exception.status < 500
 
-response_backoff = backoff.on_exception(backoff.expo,
-                                        aiohttp.ClientResponseError,
-                                        max_time=600,
-                                        giveup=giveup)
+response_backoff = backoff.on_exception(
+    backoff.expo, aiohttp.ClientResponseError, max_time=600, giveup=giveup
+)
 
 timeout_backoff = backoff.on_exception(
-    backoff.expo,
-    aiohttp.ServerTimeoutError,
-    max_time=300,
-    max_tries=5
+    backoff.expo, aiohttp.ServerTimeoutError, max_time=300, max_tries=5
 )
 
 
@@ -45,17 +40,16 @@ class HikariResponse(TypedDict):
 async def to_producer(file: str | URL) -> HikariResponse:
     url = URL(file) if isinstance(file, str) else file
     headers: dict[str, str] = {
-        "Authorization": f"Bearer {PRODUCER_TOKEN}",
-        "Expires": "0",
+        'Authorization': f'Bearer {PRODUCER_TOKEN}',
+        'Expires': '0',
     }
 
     async with get_session().get(url) as req:
         filename = url.name
         data = aiohttp.FormData()
-        data.add_field("file", req.content, filename=filename)
+        data.add_field('file', req.content, filename=filename)
 
-        async with get_session().post(PRODUCER_UPLOAD_ENDPOINT,
-                                      headers=headers, data=data) as req:
+        async with get_session().post(PRODUCER_UPLOAD_ENDPOINT, headers=headers, data=data) as req:
             return await req.json()
 
 
@@ -66,12 +60,13 @@ async def _(file: io.IOBase, filename=None) -> HikariResponse:
         file.name = filename  # type: ignore
 
     headers: dict[str, str] = {
-        "Authorization": f"Bearer {PRODUCER_TOKEN}",
-        "Expires": "0",
+        'Authorization': f'Bearer {PRODUCER_TOKEN}',
+        'Expires': '0',
     }
 
-    async with get_session().post(PRODUCER_UPLOAD_ENDPOINT,
-                                  headers=headers, data=dict(file=file)) as req:
+    async with get_session().post(
+        PRODUCER_UPLOAD_ENDPOINT, headers=headers, data=dict(file=file)
+    ) as req:
         return await req.json()
 
 
@@ -96,7 +91,7 @@ def log_time(func: Callable[P, T]) -> Callable[P, T]:
         if asyncio.iscoroutine(ret):
             ret = await ret
         end = time.monotonic()
-        logger.debug(f"{func.__name__} took {end - begin:.2f}s")
+        logger.debug(f'{func.__name__} took {end - begin:.2f}s')
         return ret
 
     return decorated  # type: ignore

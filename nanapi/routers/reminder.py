@@ -26,20 +26,17 @@ async def get_reminders(edgedb: AsyncIOClient = Depends(get_client_edgedb)):
     return await reminder_select_all(edgedb)
 
 
-@router.oauth2_client_restricted.post('/',
-                                      response_model=ReminderInsertSelectResult,
-                                      status_code=status.HTTP_201_CREATED)
-async def new_reminder(body: NewReminderBody,
-                       edgedb: AsyncIOClient = Depends(get_client_edgedb)):
+@router.oauth2_client_restricted.post(
+    '/', response_model=ReminderInsertSelectResult, status_code=status.HTTP_201_CREATED
+)
+async def new_reminder(body: NewReminderBody, edgedb: AsyncIOClient = Depends(get_client_edgedb)):
     return await reminder_insert_select(edgedb, **body.model_dump())
 
 
 @router.oauth2_client_restricted.delete(
-    '/{id}',
-    response_model=ReminderDeleteByIdResult,
-    responses={status.HTTP_204_NO_CONTENT: {}})
-async def delete_reminder(id: UUID,
-                          edgedb: AsyncIOClient = Depends(get_client_edgedb)):
+    '/{id}', response_model=ReminderDeleteByIdResult, responses={status.HTTP_204_NO_CONTENT: {}}
+)
+async def delete_reminder(id: UUID, edgedb: AsyncIOClient = Depends(get_client_edgedb)):
     resp = await reminder_delete_by_id(edgedb, id=id)
     if resp is None:
         return Response(status_code=status.HTTP_204_NO_CONTENT)

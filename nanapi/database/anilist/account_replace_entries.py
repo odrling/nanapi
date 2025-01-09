@@ -134,13 +134,13 @@ for entry in json_array_unpack(entries) union (
 
 
 ACCOUNT_REPLACE_ENTRIES_SERVICE = Literal[
-    "ANILIST",
-    "MYANIMELIST",
+    'ANILIST',
+    'MYANIMELIST',
 ]
 
 ACCOUNT_REPLACE_ENTRIES_TYPE = Literal[
-    "ANIME",
-    "MANGA",
+    'ANIME',
+    'MANGA',
 ]
 
 

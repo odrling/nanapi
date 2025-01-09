@@ -28,9 +28,9 @@ async def get_presences(edgedb: AsyncIOClient = Depends(get_client_edgedb)):
     '/',
     response_model=PresenceInsertResult,
     status_code=status.HTTP_201_CREATED,
-    responses={status.HTTP_409_CONFLICT: dict(model=HTTPExceptionModel)})
-async def new_presence(body: NewPresenceBody,
-                       edgedb: AsyncIOClient = Depends(get_client_edgedb)):
+    responses={status.HTTP_409_CONFLICT: dict(model=HTTPExceptionModel)},
+)
+async def new_presence(body: NewPresenceBody, edgedb: AsyncIOClient = Depends(get_client_edgedb)):
     try:
         return await presence_insert(edgedb, **body.model_dump())
     except ConstraintViolationError as e:
@@ -38,11 +38,9 @@ async def new_presence(body: NewPresenceBody,
 
 
 @router.oauth2_client_restricted.delete(
-    '/{id}',
-    response_model=PresenceDeleteByIdResult,
-    responses={status.HTTP_204_NO_CONTENT: {}})
-async def delete_presence(id: UUID,
-                          edgedb: AsyncIOClient = Depends(get_client_edgedb)):
+    '/{id}', response_model=PresenceDeleteByIdResult, responses={status.HTTP_204_NO_CONTENT: {}}
+)
+async def delete_presence(id: UUID, edgedb: AsyncIOClient = Depends(get_client_edgedb)):
     resp = await presence_delete_by_id(edgedb, id=id)
     if resp is None:
         return Response(status_code=status.HTTP_204_NO_CONTENT)

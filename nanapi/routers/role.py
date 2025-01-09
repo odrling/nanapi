@@ -23,9 +23,9 @@ async def get_roles(edgedb: AsyncIOClient = Depends(get_client_edgedb)):
     '/',
     response_model=RoleInsertSelectResult,
     status_code=status.HTTP_201_CREATED,
-    responses={status.HTTP_409_CONFLICT: dict(model=HTTPExceptionModel)})
-async def new_role(body: NewRoleBody,
-                   edgedb: AsyncIOClient = Depends(get_client_edgedb)):
+    responses={status.HTTP_409_CONFLICT: dict(model=HTTPExceptionModel)},
+)
+async def new_role(body: NewRoleBody, edgedb: AsyncIOClient = Depends(get_client_edgedb)):
     try:
         return await role_insert_select(edgedb, **body.model_dump())
     except ConstraintViolationError as e:
@@ -35,9 +35,9 @@ async def new_role(body: NewRoleBody,
 @router.oauth2_client_restricted.delete(
     '/{role_id}',
     response_model=RoleDeleteByRoleIdResult,
-    responses={status.HTTP_204_NO_CONTENT: {}})
-async def delete_role(role_id: int,
-                      edgedb: AsyncIOClient = Depends(get_client_edgedb)):
+    responses={status.HTTP_204_NO_CONTENT: {}},
+)
+async def delete_role(role_id: int, edgedb: AsyncIOClient = Depends(get_client_edgedb)):
     resp = await role_delete_by_role_id(edgedb, role_id=role_id)
     if resp is None:
         return Response(status_code=status.HTTP_204_NO_CONTENT)

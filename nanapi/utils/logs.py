@@ -16,14 +16,14 @@ def get_traceback(e: BaseException | None = None) -> traceback.Traceback:
     if e is None:
         return get_traceback_exc()
 
-    return traceback.Traceback.from_exception(type(e), e, e.__traceback__,
-                                              **TRACEBACK_KWARGS)
+    return traceback.Traceback.from_exception(type(e), e, e.__traceback__, **TRACEBACK_KWARGS)
 
 
 def get_traceback_exc() -> traceback.Traceback:
     return traceback.Traceback.from_exception(
         *sys.exc_info(),  # type: ignore
-        **TRACEBACK_KWARGS)
+        **TRACEBACK_KWARGS,
+    )
 
 
 @cache
@@ -33,16 +33,17 @@ def get_console() -> Console:
 
 def get_traceback_str(trace: traceback.Traceback) -> str:
     console = get_console()
-    return "".join(s.text for s in console.render(trace))
+    return ''.join(s.text for s in console.render(trace))
 
 
 class Paginator:
-
-    def __init__(self,
-                 prefix: str | None = '```',
-                 suffix: str | None = '```',
-                 max_size: int = 2000,
-                 linesep: str = '\n') -> None:
+    def __init__(
+        self,
+        prefix: str | None = '```',
+        suffix: str | None = '```',
+        max_size: int = 2000,
+        linesep: str = '\n',
+    ) -> None:
         self.prefix: str | None = prefix
         self.suffix: str | None = suffix
         self.max_size: int = max_size
@@ -53,8 +54,7 @@ class Paginator:
         """Clears the paginator to have no pages."""
         if self.prefix is not None:
             self._current_page: list[str] = [self.prefix]
-            self._count: int = len(
-                self.prefix) + self._linesep_len  # prefix + newline
+            self._count: int = len(self.prefix) + self._linesep_len  # prefix + newline
         else:
             self._current_page = []
             self._count = 0
@@ -74,11 +74,9 @@ class Paginator:
 
     def add_line(self, line: str = '', *, empty: bool = False) -> None:
         """Adds a line to the current page."""
-        max_page_size = (self.max_size - self._prefix_len -
-                         self._suffix_len - 2 * self._linesep_len)
+        max_page_size = self.max_size - self._prefix_len - self._suffix_len - 2 * self._linesep_len
         if len(line) > max_page_size:
-            raise RuntimeError(
-                f'Line exceeds maximum page size {max_page_size}')
+            raise RuntimeError(f'Line exceeds maximum page size {max_page_size}')
 
         if self._count + len(line) + self._linesep_len > self.max_size - self._suffix_len:
             self.close_page()
@@ -98,8 +96,7 @@ class Paginator:
 
         if self.prefix is not None:
             self._current_page = [self.prefix]
-            self._count = len(
-                self.prefix) + self._linesep_len  # prefix + linesep
+            self._count = len(self.prefix) + self._linesep_len  # prefix + linesep
         else:
             self._current_page = []
             self._count = 0
@@ -118,9 +115,7 @@ class Paginator:
 
 
 async def send_webhook(message: str, username: str):
-    webhook = AsyncDiscordWebhook(url=ERROR_WEBHOOK_URL,
-                                  username=username,
-                                  content=message)
+    webhook = AsyncDiscordWebhook(url=ERROR_WEBHOOK_URL, username=username, content=message)
     await webhook.execute()
 
 
@@ -133,17 +128,14 @@ async def webhook_post_error(error_msg: str, username: str = INSTANCE_NAME):
 
 
 def webhook_exceptions(func):
-
     async def wrapper(*args, **kwargs):
         try:
             return await func(*args, **kwargs)
         except Exception as e:
             if ERROR_WEBHOOK_URL:
                 trace = get_traceback(e)
-                msg = f"{get_traceback_str(trace)}\n{func=}"
-                asyncio.create_task(
-                    webhook_post_error(msg,
-                                       username=f"{INSTANCE_NAME} - Tasks"))
+                msg = f'{get_traceback_str(trace)}\n{func=}'
+                asyncio.create_task(webhook_post_error(msg, username=f'{INSTANCE_NAME} - Tasks'))
             raise
 
     wrapper.__name__ = func.__name__

@@ -40,21 +40,24 @@ from nanapi.utils.logs import get_traceback, get_traceback_str, webhook_post_err
 
 
 def custom_generate_unique_id(route: APIRoute):
-    tag_prefix = f"{route.tags[0]}_" if route.tags else ''
-    return f"{tag_prefix}{route.name}".casefold()
+    tag_prefix = f'{route.tags[0]}_' if route.tags else ''
+    return f'{tag_prefix}{route.name}'.casefold()
 
 
-app = FastAPI(title=INSTANCE_NAME,
-              openapi_url=None,
-              docs_url=None,
-              swagger_ui_oauth2_redirect_url=None,
-              redoc_url=None,
-              generate_unique_id_function=custom_generate_unique_id,
-              **FASTAPI_CONFIG)
+app = FastAPI(
+    title=INSTANCE_NAME,
+    openapi_url=None,
+    docs_url=None,
+    swagger_ui_oauth2_redirect_url=None,
+    redoc_url=None,
+    generate_unique_id_function=custom_generate_unique_id,
+    **FASTAPI_CONFIG,
+)
 
 app.add_middleware(GZipMiddleware)
 if PROFILING:
     from nanapi.utils.fastapi import ProfilerMiddleware
+
     app.add_middleware(ProfilerMiddleware, fastapi_app=app)
 
 
@@ -77,25 +80,25 @@ openapi_router = NanAPIRouter(include_in_schema=False)
 
 @openapi_router.basic_auth.get(OPENAPI_URL)
 def get_openapi_json(req: Request):
-    urls = (server_data.get("url") for server_data in app.servers)
+    urls = (server_data.get('url') for server_data in app.servers)
     server_urls = {url for url in urls if url}
-    root_path = req.scope.get("root_path", "").rstrip("/")
+    root_path = req.scope.get('root_path', '').rstrip('/')
     if root_path not in server_urls and root_path and app.root_path_in_servers:
-        app.servers.insert(0, {"url": root_path})
+        app.servers.insert(0, {'url': root_path})
         server_urls.add(root_path)
     return JSONResponse(app.openapi())
 
 
 @openapi_router.basic_auth.get(DOCS_URL)
 def get_swagger_ui(req: Request):
-    root_path = req.scope.get("root_path", "").rstrip("/")
+    root_path = req.scope.get('root_path', '').rstrip('/')
     openapi_url = root_path + OPENAPI_URL
     oauth2_redirect_url = SWAGGER_UI_OAUTH2_REDIRECT_URL
     if oauth2_redirect_url:
         oauth2_redirect_url = root_path + oauth2_redirect_url
     return get_swagger_ui_html(
         openapi_url=openapi_url,
-        title=app.title + " - Swagger UI",
+        title=app.title + ' - Swagger UI',
         oauth2_redirect_url=oauth2_redirect_url,
         init_oauth=app.swagger_ui_init_oauth,
         swagger_ui_parameters=app.swagger_ui_parameters,
@@ -109,9 +112,9 @@ def get_swagger_ui_redirect():
 
 @openapi_router.basic_auth.get(REDOC_URL)
 def get_redoc_ui(req: Request):
-    root_path = req.scope.get("root_path", "").rstrip("/")
+    root_path = req.scope.get('root_path', '').rstrip('/')
     openapi_url = root_path + OPENAPI_URL
-    return get_redoc_html(openapi_url=openapi_url, title=app.title + " - ReDoc")
+    return get_redoc_html(openapi_url=openapi_url, title=app.title + ' - ReDoc')
 
 
 app.include_router(openapi_router)
@@ -121,6 +124,6 @@ app.include_router(openapi_router)
 async def internal_server_error_handler(request: Request, e: Exception):
     if ERROR_WEBHOOK_URL:
         trace = get_traceback(e)
-        msg = f"{get_traceback_str(trace)}\n{request.method=}\n{request.url=}"
+        msg = f'{get_traceback_str(trace)}\n{request.method=}\n{request.url=}'
         asyncio.create_task(webhook_post_error(msg))
     raise e

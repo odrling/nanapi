@@ -60,30 +60,30 @@ router = NanAPIRouter(prefix='/projections', tags=['projection'])
 
 
 @router.oauth2_client.get('/', response_model=list[ProjoSelectResult])
-async def get_projections(status: PROJO_SELECT_STATUS | None = None,
-                          message_id: int | None = None,
-                          channel_id: int | None = None,
-                          edgedb: AsyncIOClient = Depends(get_client_edgedb)):
-    return await projo_select(edgedb,
-                              status=status,
-                              message_id=message_id,
-                              channel_id=channel_id)
+async def get_projections(
+    status: PROJO_SELECT_STATUS | None = None,
+    message_id: int | None = None,
+    channel_id: int | None = None,
+    edgedb: AsyncIOClient = Depends(get_client_edgedb),
+):
+    return await projo_select(edgedb, status=status, message_id=message_id, channel_id=channel_id)
 
 
-@router.oauth2_client_restricted.post('/',
-                                      response_model=ProjoInsertResult,
-                                      status_code=status.HTTP_201_CREATED)
-async def new_projection(body: NewProjectionBody,
-                         edgedb: AsyncIOClient = Depends(get_client_edgedb)):
+@router.oauth2_client_restricted.post(
+    '/', response_model=ProjoInsertResult, status_code=status.HTTP_201_CREATED
+)
+async def new_projection(
+    body: NewProjectionBody, edgedb: AsyncIOClient = Depends(get_client_edgedb)
+):
     return await projo_insert(edgedb, **body.model_dump())
 
 
 @router.oauth2_client.get(
     '/{id}',
     response_model=ProjoSelectResult,
-    responses={status.HTTP_404_NOT_FOUND: dict(model=HTTPExceptionModel)})
-async def get_projection(id: UUID,
-                         edgedb: AsyncIOClient = Depends(get_client_edgedb)):
+    responses={status.HTTP_404_NOT_FOUND: dict(model=HTTPExceptionModel)},
+)
+async def get_projection(id: UUID, edgedb: AsyncIOClient = Depends(get_client_edgedb)):
     resp = await projo_select(edgedb, id=id)
     if len(resp) == 0:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
@@ -91,11 +91,9 @@ async def get_projection(id: UUID,
 
 
 @router.oauth2_client_restricted.delete(
-    '/{id}',
-    response_model=ProjoDeleteResult,
-    responses={status.HTTP_204_NO_CONTENT: {}})
-async def delete_projection(id: UUID,
-                            edgedb: AsyncIOClient = Depends(get_client_edgedb)):
+    '/{id}', response_model=ProjoDeleteResult, responses={status.HTTP_204_NO_CONTENT: {}}
+)
+async def delete_projection(id: UUID, edgedb: AsyncIOClient = Depends(get_client_edgedb)):
     resp = await projo_delete(edgedb, id=id)
     if resp is None:
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -105,11 +103,11 @@ async def delete_projection(id: UUID,
 @router.oauth2_client_restricted.put(
     '/{id}/name',
     response_model=ProjoUpdateNameResult,
-    responses={status.HTTP_404_NOT_FOUND: dict(model=HTTPExceptionModel)})
+    responses={status.HTTP_404_NOT_FOUND: dict(model=HTTPExceptionModel)},
+)
 async def set_projection_name(
-        id: UUID,
-        body: SetProjectionNameBody,
-        edgedb: AsyncIOClient = Depends(get_client_edgedb)):
+    id: UUID, body: SetProjectionNameBody, edgedb: AsyncIOClient = Depends(get_client_edgedb)
+):
     resp = await projo_update_name(edgedb, id=id, **body.model_dump())
     if resp is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
@@ -119,11 +117,11 @@ async def set_projection_name(
 @router.oauth2_client_restricted.put(
     '/{id}/status',
     response_model=ProjoUpdateStatusResult,
-    responses={status.HTTP_404_NOT_FOUND: dict(model=HTTPExceptionModel)})
+    responses={status.HTTP_404_NOT_FOUND: dict(model=HTTPExceptionModel)},
+)
 async def set_projection_status(
-        id: UUID,
-        body: SetProjectionStatusBody,
-        edgedb: AsyncIOClient = Depends(get_client_edgedb)):
+    id: UUID, body: SetProjectionStatusBody, edgedb: AsyncIOClient = Depends(get_client_edgedb)
+):
     resp = await projo_update_status(edgedb, id=id, **body.model_dump())
     if resp is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
@@ -133,11 +131,11 @@ async def set_projection_status(
 @router.oauth2_client_restricted.put(
     '/{id}/message_id',
     response_model=ProjoUpdateMessageIdResult,
-    responses={status.HTTP_404_NOT_FOUND: dict(model=HTTPExceptionModel)})
+    responses={status.HTTP_404_NOT_FOUND: dict(model=HTTPExceptionModel)},
+)
 async def set_projection_message_id(
-        id: UUID,
-        body: SetProjectionMessageIdBody,
-        edgedb: AsyncIOClient = Depends(get_client_edgedb)):
+    id: UUID, body: SetProjectionMessageIdBody, edgedb: AsyncIOClient = Depends(get_client_edgedb)
+):
     resp = await projo_update_message_id(edgedb, id=id, **body.model_dump())
     if resp is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
@@ -147,34 +145,32 @@ async def set_projection_message_id(
 @router.oauth2_client_restricted.put(
     '/{id}/medias/anilist/{id_al}',
     response_model=ProjoAddMediaResult,
-    responses={status.HTTP_404_NOT_FOUND: dict(model=HTTPExceptionModel)})
+    responses={status.HTTP_404_NOT_FOUND: dict(model=HTTPExceptionModel)},
+)
 async def add_projection_anilist_media(
-        id: UUID,
-        id_al: int,
-        edgedb: AsyncIOClient = Depends(get_client_edgedb)):
+    id: UUID, id_al: int, edgedb: AsyncIOClient = Depends(get_client_edgedb)
+):
     multitons = ALMultitons()
     media = Media.get(multitons, id_al)
     async for m in Media.load({media}, full=False):
         await m.edgedb_merge(edgedb)
         break
     else:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail='Media Not found')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Media Not found')
     resp = await projo_add_media(edgedb, id=id, id_al=id_al)
     if resp is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                            detail='Projection Not found')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Projection Not found')
     return resp
 
 
 @router.oauth2_client_restricted.post(
     '/{id}/medias/external',
     response_model=ProjoAddExternalMediaResult,
-    responses={status.HTTP_404_NOT_FOUND: dict(model=HTTPExceptionModel)})
+    responses={status.HTTP_404_NOT_FOUND: dict(model=HTTPExceptionModel)},
+)
 async def add_projection_external_media(
-        id: UUID,
-        body: ProjoAddExternalMediaBody,
-        edgedb: AsyncIOClient = Depends(get_client_edgedb)):
+    id: UUID, body: ProjoAddExternalMediaBody, edgedb: AsyncIOClient = Depends(get_client_edgedb)
+):
     resp = await projo_add_external_media(edgedb, id=id, **body.model_dump())
     if resp is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
@@ -184,11 +180,11 @@ async def add_projection_external_media(
 @router.oauth2_client_restricted.delete(
     '/{id}/medias/anilist/{id_al}',
     response_model=ProjoRemoveMediaResult,
-    responses={status.HTTP_204_NO_CONTENT: {}})
+    responses={status.HTTP_204_NO_CONTENT: {}},
+)
 async def remove_projection_media(
-        id: UUID,
-        id_al: int,
-        edgedb: AsyncIOClient = Depends(get_client_edgedb)):
+    id: UUID, id_al: int, edgedb: AsyncIOClient = Depends(get_client_edgedb)
+):
     resp = await projo_remove_media(edgedb, id=id, id_al=id_al)
     if resp is None:
         return Response(status_code=status.HTTP_204_NO_CONTENT)
@@ -198,13 +194,12 @@ async def remove_projection_media(
 @router.oauth2_client_restricted.delete(
     '/{id}/medias/external/{external_media_id}',
     response_model=ProjoRemoveExternalMediaResult,
-    responses={status.HTTP_204_NO_CONTENT: {}})
+    responses={status.HTTP_204_NO_CONTENT: {}},
+)
 async def remove_projection_external_media(
-        id: UUID,
-        external_media_id: UUID,
-        edgedb: AsyncIOClient = Depends(get_client_edgedb)):
-    resp = await projo_remove_external_media(
-        edgedb, id=id, external_media_id=external_media_id)
+    id: UUID, external_media_id: UUID, edgedb: AsyncIOClient = Depends(get_client_edgedb)
+):
+    resp = await projo_remove_external_media(edgedb, id=id, external_media_id=external_media_id)
     if resp is None:
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     return resp
@@ -252,11 +247,11 @@ async def remove_projection_participant(
     '/{id}/guild_events/{discord_id}',
     response_model=ProjoAddEventResult,
     status_code=status.HTTP_201_CREATED,
-    responses={status.HTTP_404_NOT_FOUND: dict(model=HTTPExceptionModel)})
+    responses={status.HTTP_404_NOT_FOUND: dict(model=HTTPExceptionModel)},
+)
 async def add_projection_guild_event(
-        id: UUID,
-        discord_id: int,
-        edgedb: AsyncIOClient = Depends(get_client_edgedb)):
+    id: UUID, discord_id: int, edgedb: AsyncIOClient = Depends(get_client_edgedb)
+):
     resp = await projo_add_event(edgedb, id=id, event_discord_id=discord_id)
     if resp is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
@@ -268,6 +263,6 @@ async def add_projection_guild_event(
     response_model=ProjoDeleteUpcomingEventsResult,
 )
 async def delete_upcoming_projection_events(
-        id: UUID,
-        edgedb: AsyncIOClient = Depends(get_client_edgedb)):
+    id: UUID, edgedb: AsyncIOClient = Depends(get_client_edgedb)
+):
     return await projo_delete_upcoming_events(edgedb, id=id)

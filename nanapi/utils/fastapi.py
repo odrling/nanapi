@@ -24,7 +24,6 @@ class HTTPExceptionModel(BaseModel):
 
 
 class NanAPIRouter(APIRouter):
-
     @cached_property
     def public(self) -> Self:
         return APIRouterProxy(self)  # type: ignore
@@ -81,11 +80,9 @@ class NanAPIRouter(APIRouter):
 
 
 class APIRouterProxy:
-
-    def __init__(self,
-                 router: APIRouter,
-                 dependencies: list | None = None,
-                 responses: dict | None = None) -> None:
+    def __init__(
+        self, router: APIRouter, dependencies: list | None = None, responses: dict | None = None
+    ) -> None:
         self.router = router
         self.dependencies = dependencies
         self.responses = responses
@@ -138,26 +135,28 @@ async def get_current_client(token: str = Depends(OAUTH2_SCHEME)) -> ClientGetBy
         token_data = TokenData(username=username)
     except jwt.PyJWTError:
         raise credentials_exception
-    client = await client_get_by_username(get_edgedb(),
-                                          username=token_data.username)
+    client = await client_get_by_username(get_edgedb(), username=token_data.username)
     if client is None:
         raise credentials_exception
     return client
 
 
 def client_id_param(
-        client_id: UUID | None = None,
-        current_client: ClientGetByUsernameResult = Depends(get_current_client)) -> UUID:
+    client_id: UUID | None = None,
+    current_client: ClientGetByUsernameResult = Depends(get_current_client),
+) -> UUID:
     return client_id or current_client.id
 
 
 async def check_restricted_access(
-        client_id: UUID = Depends(client_id_param),
-        current_client: ClientGetByUsernameResult = Depends(get_current_client)):
+    client_id: UUID = Depends(client_id_param),
+    current_client: ClientGetByUsernameResult = Depends(get_current_client),
+):
     if client_id != current_client.id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail='client_id does not match the current client')
+            detail='client_id does not match the current client',
+        )
 
 
 @cache
@@ -177,10 +176,8 @@ if PROFILING:
             self.results: list[tuple[str, str, str]] = []
             if fastapi_app is not None:
                 router = APIRouter(prefix='/profiler', tags=['profiler'])
-                router.add_api_route('/', self.list_results,
-                                     response_class=HTMLResponse)
-                router.add_api_route('/{id}', self.get_result,
-                                     response_class=HTMLResponse)
+                router.add_api_route('/', self.list_results, response_class=HTMLResponse)
+                router.add_api_route('/{id}', self.get_result, response_class=HTMLResponse)
                 fastapi_app.include_router(router)
 
         @override
@@ -189,15 +186,13 @@ if PROFILING:
             profiler.start()
             resp = await call_next(request)
             profiler.stop()
-            self.results.append(
-                (request.method, str(request.url), profiler.output_html()))
+            self.results.append((request.method, str(request.url), profiler.output_html()))
             return resp
 
         async def list_results(self):
             li = []
             for i, (method, url, _) in enumerate(self.results):
-                li.append(
-                    f'<li><a href="/profiler/{i}">{method} {url}</a></li>')
+                li.append(f'<li><a href="/profiler/{i}">{method} {url}</a></li>')
             resp = f'<ul>\n{"\n".join(reversed(li))}\n</ul>'
             return resp
 

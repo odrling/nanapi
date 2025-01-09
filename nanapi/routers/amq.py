@@ -17,22 +17,18 @@ async def get_accounts(username: str | None = None):
     return await account_select(get_edgedb(), username=username)
 
 
-@router.oauth2.patch('/accounts/{discord_id}',
-                     response_model=AccountMergeResult)
+@router.oauth2.patch('/accounts/{discord_id}', response_model=AccountMergeResult)
 async def upsert_account(discord_id: int, body: UpsertAMQAccountBody):
-    return await account_merge(get_edgedb(),
-                               discord_id=discord_id,
-                               **body.model_dump())
+    return await account_merge(get_edgedb(), discord_id=discord_id, **body.model_dump())
 
 
-@router.oauth2_client.get('/settings',
-                          response_model=list[SettingsSelectAllResult])
+@router.oauth2_client.get('/settings', response_model=list[SettingsSelectAllResult])
 async def get_settings(edgedb: AsyncIOClient = Depends(get_client_edgedb)):
     return await settings_select_all(edgedb)
 
 
-@router.oauth2_client_restricted.patch('/settings',
-                                       response_model=list[SettingsMergeResult])
-async def update_settings(body: UpdateAMQSettingsBody,
-                          edgedb: AsyncIOClient = Depends(get_client_edgedb)):
+@router.oauth2_client_restricted.patch('/settings', response_model=list[SettingsMergeResult])
+async def update_settings(
+    body: UpdateAMQSettingsBody, edgedb: AsyncIOClient = Depends(get_client_edgedb)
+):
     return await settings_merge(edgedb, **body.model_dump())

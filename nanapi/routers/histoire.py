@@ -29,9 +29,9 @@ async def histoire_index(edgedb: AsyncIOClient = Depends(get_client_edgedb)):
     '/',
     response_model=HistoireInsertResult,
     status_code=status.HTTP_201_CREATED,
-    responses={status.HTTP_409_CONFLICT: dict(model=HTTPExceptionModel)})
-async def new_histoire(body: NewHistoireBody,
-                       edgedb: AsyncIOClient = Depends(get_client_edgedb)):
+    responses={status.HTTP_409_CONFLICT: dict(model=HTTPExceptionModel)},
+)
+async def new_histoire(body: NewHistoireBody, edgedb: AsyncIOClient = Depends(get_client_edgedb)):
     try:
         return await histoire_insert(edgedb, **body.model_dump())
     except ConstraintViolationError as e:
@@ -41,9 +41,9 @@ async def new_histoire(body: NewHistoireBody,
 @router.oauth2_client.get(
     '/{id}',
     response_model=HistoireGetByIdResult,
-    responses={status.HTTP_404_NOT_FOUND: dict(model=HTTPExceptionModel)})
-async def get_histoire(id: UUID,
-                       edgedb: AsyncIOClient = Depends(get_client_edgedb)):
+    responses={status.HTTP_404_NOT_FOUND: dict(model=HTTPExceptionModel)},
+)
+async def get_histoire(id: UUID, edgedb: AsyncIOClient = Depends(get_client_edgedb)):
     resp = await histoire_get_by_id(edgedb, id=id)
     if resp is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
@@ -51,11 +51,9 @@ async def get_histoire(id: UUID,
 
 
 @router.oauth2_client_restricted.delete(
-    '/{id}',
-    response_model=HistoireDeleteByIdResult,
-    responses={status.HTTP_204_NO_CONTENT: {}})
-async def delete_histoire(id: UUID,
-                          edgedb: AsyncIOClient = Depends(get_client_edgedb)):
+    '/{id}', response_model=HistoireDeleteByIdResult, responses={status.HTTP_204_NO_CONTENT: {}}
+)
+async def delete_histoire(id: UUID, edgedb: AsyncIOClient = Depends(get_client_edgedb)):
     resp = await histoire_delete_by_id(edgedb, id=id)
     if resp is None:
         return Response(status_code=status.HTTP_204_NO_CONTENT)

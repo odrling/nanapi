@@ -32,7 +32,7 @@ async def refresh_lists():
 
         anilists = await account_select_all(get_edgedb())
         almedias: set[ALMedia] = set()
-        logger.info(f"refresh_lists: refreshing {len(anilists)} users")
+        logger.info(f'refresh_lists: refreshing {len(anilists)} users')
 
         for al in anilists:
             service = AnilistService(al.service)
@@ -44,9 +44,7 @@ async def refresh_lists():
                 except Exception as e:
                     logger.exception(e)
 
-        logger.info(
-            f"refresh_lists: fetched page 1 for {len(almedias)} medias in total"
-        )
+        logger.info(f'refresh_lists: fetched page 1 for {len(almedias)} medias in total')
 
         medias = []
         for almedia in almedias:
@@ -56,12 +54,13 @@ async def refresh_lists():
 
 
 async def refresh_list(userlist: Userlist, media_type: MediaType):
-    logger_list = f"{userlist.service}/{userlist.username}/{media_type}"
-    logger.info(f"refresh_list: fetching {logger_list}")
-    entries, user_almedias = await userlist.refresh(media_type,
-                                                    al_low_priority=True)
-    logger.info(f"refresh_list: {logger_list} fetched "
-                f"with {len(entries)} entries and {len(user_almedias)} medias")
+    logger_list = f'{userlist.service}/{userlist.username}/{media_type}'
+    logger.info(f'refresh_list: fetching {logger_list}')
+    entries, user_almedias = await userlist.refresh(media_type, al_low_priority=True)
+    logger.info(
+        f'refresh_list: {logger_list} fetched '
+        f'with {len(entries)} entries and {len(user_almedias)} medias'
+    )
     if len(entries) > 0:
         edgedb_data = userlist.to_edgedb(media_type, entries, user_almedias)
         await account_replace_entries(get_edgedb(), **edgedb_data)
@@ -72,6 +71,6 @@ async def main():
     await refresh_lists()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     logging.basicConfig(level=LOG_LEVEL)
     asyncio.run(main())
