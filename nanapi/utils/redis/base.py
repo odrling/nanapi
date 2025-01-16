@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Generic, TypeVar
 
 import orjson
+from edgedb import AsyncIOExecutor
 
 from nanapi.database.redis.data_delete_by_key import data_delete_by_key
 from nanapi.database.redis.data_get_by_key import DataGetByKeyResult, data_get_by_key
@@ -27,30 +28,50 @@ class BaseRedis(ABC, Generic[T]):
     def __init__(self, key: str, global_key: bool = False):
         self.key = key if global_key else make_redis_key(key)
 
-    async def get(self, sub_key: str | int | None = None) -> T | None:
+    async def get(
+        self, sub_key: str | int | None = None, tx: AsyncIOExecutor | None = None
+    ) -> T | None:
         key = self.key if sub_key is None else f'{self.key}:{sub_key}'
         try:
-            resp = await data_get_by_key(get_edgedb(), key=key)
+            if tx is None:
+                tx = get_edgedb()
+
+            resp = await data_get_by_key(tx, key=key)
             return self._decode(resp)
         except Exception as e:
             logger.exception(e)
             return
 
-    async def set(self, value: T, sub_key: str | int | None = None, **kwargs):
+    async def set(
+        self,
+        value: T,
+        sub_key: str | int | None = None,
+        tx: AsyncIOExecutor | None = None,
+    ):
         key = self.key if sub_key is None else f'{self.key}:{sub_key}'
         encoded_value = self.encode(value)
         try:
-            await data_merge(get_edgedb(), key=key, value=encoded_value)
+            if tx is None:
+                tx = get_edgedb()
+
+            await data_merge(tx, key=key, value=encoded_value)
         except Exception as e:
             logger.exception(e)
             return
 
-    async def delete(self, sub_key: str | int | None = None):
+    async def delete(self, sub_key: str | int | None = None, tx: AsyncIOExecutor | None = None):
         key = self.key if sub_key is None else f'{self.key}:{sub_key}'
-        await data_delete_by_key(get_edgedb(), key=key)
 
-    async def get_all(self):
-        resp = await data_select_key_ilike(get_edgedb(), pattern=f'{self.key}:%')
+        if tx is None:
+            tx = get_edgedb()
+
+        await data_delete_by_key(tx, key=key)
+
+    async def get_all(self, tx: AsyncIOExecutor | None = None):
+        if tx is None:
+            tx = get_edgedb()
+
+        resp = await data_select_key_ilike(tx, pattern=f'{self.key}:%')
         for item in resp:
             *_, sub_key = item.key.rpartition(':')
             yield sub_key, await self.get(sub_key)

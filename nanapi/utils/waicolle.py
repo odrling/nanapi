@@ -304,7 +304,7 @@ class TagRoll(BaseMediaRoll):
         price = await super().get_price(executor, discord_id)
         if self.discount_first:
             redis_player_key = f'{discord_id}_{get_current_date()}'
-            if not await user_daily_roll.get(redis_player_key):
+            if not await user_daily_roll.get(redis_player_key, tx=executor):
                 price //= 2
         return price
 
@@ -415,7 +415,7 @@ class SeasonalRoll(BaseMediaRoll):
         if self.discount_first:
             curr_date = get_current_date().isocalendar()
             redis_player_key = f'{discord_id}_{(curr_date.year, curr_date.week)}'
-            if not await user_weekly_roll.get(redis_player_key):
+            if not await user_weekly_roll.get(redis_player_key, tx=executor):
                 price //= 2
         return price
 
