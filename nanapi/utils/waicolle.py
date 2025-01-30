@@ -267,7 +267,7 @@ def get_current_date() -> date:
 
 class TagRoll(BaseMediaRoll):
     DAILY_BASE_PRICE = 150
-    DAILY_NB = 2
+    DAILY_NB = 1
     daily_rolls: dict[date, Self] = {}
 
     def __init__(
@@ -368,7 +368,7 @@ class TagRoll(BaseMediaRoll):
 
 
 class SeasonalRoll(BaseMediaRoll):
-    WEEKLY_BASE_PRICE = 300
+    WEEKLY_BASE_PRICE = 600
     WEEKLY_NB = 5
     weekly_rolls: dict[tuple[int, int], Self] = {}
 
