@@ -676,7 +676,7 @@ wheels = [
 
 [[package]]
 name = "meilisearch-python-sdk"
-version = "4.0.0"
+version = "4.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiofiles" },
@@ -685,9 +685,9 @@ dependencies = [
     { name = "pydantic" },
     { name = "pyjwt" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/3f/f7/287a0007e880ab77ac9a3ba2bc332c12d33538e40c1a9ae6d5028ce03f61/meilisearch_python_sdk-4.0.0.tar.gz", hash = "sha256:4ed3d4de7bd7444344f463ed74a47cee2a2e0cc8c5d8170c802ed77c052a0f29", size = 229592 }
+sdist = { url = "https://files.pythonhosted.org/packages/62/cc/0fdc8293caf40c938d994ea039d2d9d4491f2b3c530548a579f278fc83c2/meilisearch_python_sdk-4.1.0.tar.gz", hash = "sha256:45ce8bc2bc6b97253bc0802474c82edf352f035c3b12f0da694a5e98e4515b15", size = 231690 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/73/ca/dea1e44ac2e126a30d1a5c79ae2e5bf2577e6bfcb17b32a728e642091d9a/meilisearch_python_sdk-4.0.0-py3-none-any.whl", hash = "sha256:f5e66df15253071b864a7f0a9882cadb1c98c0e8ad9d4f6928482d9be9c5fca6", size = 60891 },
+    { url = "https://files.pythonhosted.org/packages/c9/95/4543e5aba5112178e185baf96c1d49685b73bb6910c299369493b3e64bde/meilisearch_python_sdk-4.1.0-py3-none-any.whl", hash = "sha256:c56d9514a4f1a4041463f62a0e843b8b6cc0b6312d927f6d85b8f891921c897f", size = 63004 },
 ]
 
 [[package]]
@@ -778,7 +778,7 @@ requires-dist = [
     { name = "faust-cchardet", specifier = "==2.1.19" },
     { name = "hypercorn", specifier = "==0.17.3" },
     { name = "ics", specifier = "==0.7.2" },
-    { name = "meilisearch-python-sdk", specifier = "==4.0.0" },
+    { name = "meilisearch-python-sdk", specifier = "==4.1.0" },
     { name = "numpy", specifier = "==2.2.2" },
     { name = "orjson", specifier = "==3.10.15" },
     { name = "passlib", extras = ["bcrypt"], specifier = "==1.7.4" },
