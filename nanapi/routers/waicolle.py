@@ -825,13 +825,9 @@ async def get_waifus(
 
 @router.oauth2_client_restricted.patch('/waifus', response_model=list[WaifuBulkUpdateResult])
 async def bulk_update_waifus(
-    ids: str, body: BulkUpdateWaifusBody, edgedb: AsyncIOClient = Depends(get_client_edgedb)
+    body: BulkUpdateWaifusBody, edgedb: AsyncIOClient = Depends(get_client_edgedb)
 ):
-    try:
-        parsed_ids = [UUID(id) for id in ids.split(',')] if len(ids) > 0 else []
-    except ValueError:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
-    return await waifu_bulk_update(edgedb, ids=parsed_ids, **body.model_dump())
+    return await waifu_bulk_update(edgedb, **body.model_dump())
 
 
 @router.oauth2_client_restricted.post(

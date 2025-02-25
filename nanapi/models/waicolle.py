@@ -182,6 +182,7 @@ COLLAGE_CHOICE = Literal['FULL', 'LOCKED', 'UNLOCKED', 'ASCENDED', 'EDGED', 'CUS
 
 
 class BulkUpdateWaifusBody(BaseModel):
+    ids: list[UUID]
     locked: bool | None = None
     blooded: bool | None = None
     nanaed: bool | None = None
