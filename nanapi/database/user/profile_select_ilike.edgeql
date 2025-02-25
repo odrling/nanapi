@@ -13,4 +13,8 @@ select user::Profile {
     discord_id_str,
   },
 }
-filter .full_name ilike pattern or .telephone ilike pattern
+filter (
+  (.full_name ilike pattern) ?? false
+  or (.n7_major ilike pattern) ?? false
+  or (.pronouns ilike pattern) ?? false
+)
