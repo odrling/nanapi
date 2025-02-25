@@ -4,5 +4,14 @@
     "github>Japan7/renovate-config",
     "github>Japan7/renovate-config:python",
     "github>Japan7/renovate-config:python-app"
+  ],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "fileMatch": ["edgedb.toml"],
+      "matchStrings": ["server-version = \"=(?<currentValue>\\S+)\""],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "edgedb/edgedb"
+    }
   ]
 }
