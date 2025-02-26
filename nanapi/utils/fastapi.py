@@ -2,7 +2,7 @@ from functools import cache, cached_property
 from typing import Self, cast, override
 from uuid import UUID
 
-import edgedb
+import gel
 import jwt
 from fastapi import APIRouter, Depends, FastAPI, HTTPException, status
 from fastapi.responses import HTMLResponse
@@ -160,9 +160,9 @@ async def check_restricted_access(
 
 
 @cache
-def get_client_edgedb(client_id: UUID = Depends(client_id_param)) -> edgedb.AsyncIOClient:
+def get_client_edgedb(client_id: UUID = Depends(client_id_param)) -> gel.AsyncIOClient:
     client = get_edgedb().with_globals(client_id=client_id)
-    return cast(edgedb.AsyncIOClient, client)
+    return cast(gel.AsyncIOClient, client)
 
 
 if PROFILING:

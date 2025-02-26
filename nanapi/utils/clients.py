@@ -2,7 +2,7 @@ from functools import cache
 from typing import cast
 
 import aiohttp
-import edgedb
+import gel
 import meilisearch_python_sdk
 import orjson
 from meilisearch_python_sdk.json_handler import OrjsonHandler
@@ -11,16 +11,15 @@ from nanapi.settings import EDGEDB_CONFIG, MEILISEARCH_CONFIG, MEILISEARCH_HOST_
 
 
 @cache
-def get_edgedb() -> edgedb.AsyncIOClient:
+def get_edgedb() -> gel.AsyncIOClient:
     return _get_edgedb()
 
 
-def _get_edgedb() -> edgedb.AsyncIOClient:
-    client = edgedb.create_async_client(**EDGEDB_CONFIG)
-    client = client.with_retry_options(
-        edgedb.RetryOptions(attempts=300)
-    )  # TODO: something more clever
-    return cast(edgedb.AsyncIOClient, client)
+def _get_edgedb() -> gel.AsyncIOClient:
+    client = gel.create_async_client(**EDGEDB_CONFIG)
+    # TODO: something more clever
+    client = client.with_retry_options(gel.RetryOptions(attempts=300))
+    return cast(gel.AsyncIOClient, client)
 
 
 def get_meilisearch() -> meilisearch_python_sdk.AsyncClient:

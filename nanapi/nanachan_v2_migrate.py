@@ -8,7 +8,7 @@ from argparse import ArgumentParser
 from datetime import datetime
 from typing import cast
 
-import edgedb
+import gel
 import orjson
 
 from nanapi.database.amq.account_merge import \
@@ -46,7 +46,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-async def migrate_amq(cur: sqlite3.Cursor, executor: edgedb.AsyncIOExecutor):
+async def migrate_amq(cur: sqlite3.Cursor, executor: gel.AsyncIOExecutor):
     logger.info('Migrate amq')
     for row in cur.execute('select * from amq_a_m_q_players').fetchall():
         discord_id, username = row
@@ -60,7 +60,7 @@ async def migrate_amq(cur: sqlite3.Cursor, executor: edgedb.AsyncIOExecutor):
 
 
 async def migrate_anilist(cur: sqlite3.Cursor,
-                          executor: edgedb.AsyncIOExecutor):
+                          executor: gel.AsyncIOExecutor):
     logger.info('Migrate anilist')
     SERVICE_MAP = {
         'al': 'ANILIST',
@@ -76,14 +76,14 @@ async def migrate_anilist(cur: sqlite3.Cursor,
 
 
 async def migrate_histoire(cur: sqlite3.Cursor,
-                           executor: edgedb.AsyncIOExecutor):
+                           executor: gel.AsyncIOExecutor):
     logger.info('Migrate histoire')
     for row in cur.execute('select * from histoire_story_model').fetchall():
         _, title, text, _ = row
         await histoire_insert(executor, title=title, text=text)
 
 
-async def migrate_poll(cur: sqlite3.Cursor, executor: edgedb.AsyncIOExecutor):
+async def migrate_poll(cur: sqlite3.Cursor, executor: gel.AsyncIOExecutor):
     logger.info('Migrate poll')
     for poll_row in cur.execute('select * from polls_poll').fetchall():
         poll_id, message_id, channel_id, question = poll_row
@@ -109,7 +109,7 @@ async def migrate_poll(cur: sqlite3.Cursor, executor: edgedb.AsyncIOExecutor):
                              rank=options_map[option_id])
 
 
-async def migrate_pot(cur: sqlite3.Cursor, executor: edgedb.AsyncIOExecutor):
+async def migrate_pot(cur: sqlite3.Cursor, executor: gel.AsyncIOExecutor):
     logger.info('Migrate pot')
     QUERY = r"""
     with
@@ -149,7 +149,7 @@ async def migrate_pot(cur: sqlite3.Cursor, executor: edgedb.AsyncIOExecutor):
 
 
 async def migrate_presence(cur: sqlite3.Cursor,
-                           executor: edgedb.AsyncIOExecutor):
+                           executor: gel.AsyncIOExecutor):
     logger.info('Migrate presence')
     TYPE_MAP = {
         'playing': 'PLAYING',
@@ -165,7 +165,7 @@ async def migrate_presence(cur: sqlite3.Cursor,
 
 
 async def migrate_projection(cur: sqlite3.Cursor,
-                             executor: edgedb.AsyncIOExecutor):
+                             executor: gel.AsyncIOExecutor):
     logger.info('Migrate projection')
     PROJECTION_QUERY = r"""
     with
@@ -226,7 +226,7 @@ async def migrate_projection(cur: sqlite3.Cursor,
                                   description=description)
 
 
-async def migrate_quizz(cur: sqlite3.Cursor, executor: edgedb.AsyncIOExecutor):
+async def migrate_quizz(cur: sqlite3.Cursor, executor: gel.AsyncIOExecutor):
     logger.info('Migrate quizz')
     QUIZZ_QUERY = r"""
     with
@@ -348,7 +348,7 @@ async def migrate_quizz(cur: sqlite3.Cursor, executor: edgedb.AsyncIOExecutor):
 
 
 async def migrate_reminder(cur: sqlite3.Cursor,
-                           executor: edgedb.AsyncIOExecutor):
+                           executor: gel.AsyncIOExecutor):
     logger.info('Migrate reminder')
     for row in cur.execute('select * from remindme_reminder').fetchall():
         _, discord_id, channel_id, unix_timestamp, message = row
@@ -361,7 +361,7 @@ async def migrate_reminder(cur: sqlite3.Cursor,
                                      timestamp=timestamp)
 
 
-async def migrate_role(cur: sqlite3.Cursor, executor: edgedb.AsyncIOExecutor):
+async def migrate_role(cur: sqlite3.Cursor, executor: gel.AsyncIOExecutor):
     logger.info('Migrate role')
     for row in cur.execute(
             'select * from roles_auto_assignable_roles').fetchall():
@@ -369,7 +369,7 @@ async def migrate_role(cur: sqlite3.Cursor, executor: edgedb.AsyncIOExecutor):
         await role_insert_select(executor, role_id=role_id, emoji=emoji)
 
 
-async def migrate_user(cur: sqlite3.Cursor, executor: edgedb.AsyncIOExecutor):
+async def migrate_user(cur: sqlite3.Cursor, executor: gel.AsyncIOExecutor):
     logger.info('Migrate user')
     for row in cur.execute('select * from profiles_profile').fetchall():
         _, discord_id, full_name, photo, promotion, telephone = row
@@ -383,7 +383,7 @@ async def migrate_user(cur: sqlite3.Cursor, executor: edgedb.AsyncIOExecutor):
 
 
 async def migrate_waicolle(cur: sqlite3.Cursor,
-                           executor: edgedb.AsyncIOExecutor):
+                           executor: gel.AsyncIOExecutor):
     logger.info('Migrate waicolle')
     PLAYER_QUERY = r"""
     with
@@ -568,7 +568,7 @@ async def migrate_waicolle(cur: sqlite3.Cursor,
 async def main(con: sqlite3.Connection):
     logger.info('Starting migration')
     cur = con.cursor()
-    client = cast(edgedb.AsyncIOClient,
+    client = cast(gel.AsyncIOClient,
                   _get_edgedb().with_globals({'client_id': args.client_id}))
     async for tx in client.transaction():
         async with tx:
