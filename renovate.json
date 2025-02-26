@@ -7,7 +7,7 @@
   ],
   "packageRules": [
     {
-      "matchPackageNames": ["edgedb/edgedb"],
+      "matchPackageNames": ["geldata/gel"],
       "matchUpdateTypes": ["minor"],
       "automerge": false
     }
@@ -18,7 +18,7 @@
       "fileMatch": ["edgedb.toml"],
       "matchStrings": ["server-version = \"=(?<currentValue>\\S+)\""],
       "datasourceTemplate": "docker",
-      "depNameTemplate": "edgedb/edgedb"
+      "depNameTemplate": "geldata/gel"
     }
   ]
 }
