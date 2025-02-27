@@ -1,8 +1,8 @@
 from datetime import timedelta
 
-from edgedb import ConstraintViolationError
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
+from gel import ConstraintViolationError
 
 from nanapi.database.default.client_get_by_username import ClientGetByUsernameResult
 from nanapi.database.default.client_insert import ClientInsertResult, client_insert

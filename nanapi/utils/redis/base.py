@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from typing import Any, Generic, TypeVar
 
 import orjson
-from edgedb import AsyncIOExecutor
+from gel import AsyncIOExecutor
 
 from nanapi.database.redis.data_delete_by_key import data_delete_by_key
 from nanapi.database.redis.data_get_by_key import DataGetByKeyResult, data_get_by_key

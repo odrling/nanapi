@@ -4,9 +4,9 @@ from collections import defaultdict
 from datetime import datetime, timedelta
 from uuid import UUID
 
-from edgedb import AsyncIOClient, AsyncIOExecutor
-from edgedb.errors import CardinalityViolationError, ConstraintViolationError
 from fastapi import Depends, HTTPException, Response, status
+from gel import AsyncIOClient, AsyncIOExecutor
+from gel.errors import CardinalityViolationError, ConstraintViolationError
 
 from nanapi.database.anilist.c_edge_select_filter_media import (
     c_edge_select_filter_media,

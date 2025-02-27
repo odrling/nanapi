@@ -1,6 +1,6 @@
-from edgedb import AsyncIOClient
-from edgedb.errors import ConstraintViolationError
 from fastapi import Depends, HTTPException, Response, status
+from gel import AsyncIOClient
+from gel.errors import ConstraintViolationError
 
 from nanapi.database.role.role_delete_by_role_id import (
     RoleDeleteByRoleIdResult,

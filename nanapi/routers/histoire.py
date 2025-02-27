@@ -1,8 +1,8 @@
 from uuid import UUID
 
-from edgedb import AsyncIOClient
-from edgedb.errors import ConstraintViolationError
 from fastapi import Depends, HTTPException, Response, status
+from gel import AsyncIOClient
+from gel.errors import ConstraintViolationError
 
 from nanapi.database.histoire.histoire_delete_by_id import (
     HistoireDeleteByIdResult,

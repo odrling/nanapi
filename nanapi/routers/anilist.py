@@ -1,6 +1,6 @@
-from edgedb.errors import ConstraintViolationError
 from fastapi import HTTPException, status
 from fastapi.responses import StreamingResponse
+from gel.errors import ConstraintViolationError
 
 from nanapi.database.anilist.account_merge import AccountMergeResult, account_merge
 from nanapi.database.anilist.account_select_all import AccountSelectAllResult, account_select_all

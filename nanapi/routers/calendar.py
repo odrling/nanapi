@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from edgedb import AsyncIOClient
 from fastapi import Depends, HTTPException, Response, status
+from gel import AsyncIOClient
 
 from nanapi.database.calendar.guild_event_delete import GuildEventDeleteResult, guild_event_delete
 from nanapi.database.calendar.guild_event_merge import GuildEventMergeResult, guild_event_merge

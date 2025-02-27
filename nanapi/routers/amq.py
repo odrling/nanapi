@@ -1,5 +1,5 @@
-from edgedb import AsyncIOClient
 from fastapi import Depends
+from gel import AsyncIOClient
 
 from nanapi.database.amq.account_merge import AccountMergeResult, account_merge
 from nanapi.database.amq.account_select import AccountSelectResult, account_select

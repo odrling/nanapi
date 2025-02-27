@@ -1,5 +1,5 @@
-from edgedb import AsyncIOClient
 from fastapi import Depends, HTTPException, status
+from gel import AsyncIOClient
 
 from nanapi.database.pot.pot_add import PotAddResult, pot_add
 from nanapi.database.pot.pot_get_by_user import PotGetByUserResult, pot_get_by_user

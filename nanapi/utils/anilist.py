@@ -9,7 +9,7 @@ from typing import Any, Generic, Self, TypeVar, override
 
 import aiohttp
 import orjson
-from edgedb import AsyncIOExecutor
+from gel import AsyncIOExecutor
 from pydantic import TypeAdapter
 from toolz.curried import concat
 

@@ -12,7 +12,7 @@ import numpy.typing as npt
 from asyncache import cached
 from cachetools import TTLCache
 from cachetools.keys import hashkey
-from edgedb import AsyncIOExecutor
+from gel import AsyncIOExecutor
 
 from nanapi.database.anilist.anime_select_ids_upcoming import anime_select_ids_upcoming
 from nanapi.database.anilist.c_edge_select_filter_media import (

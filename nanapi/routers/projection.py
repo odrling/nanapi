@@ -1,7 +1,7 @@
 from uuid import UUID
 
-from edgedb import AsyncIOClient
 from fastapi import Depends, HTTPException, Response, status
+from gel import AsyncIOClient
 
 from nanapi.database.projection.projo_add_event import ProjoAddEventResult, projo_add_event
 from nanapi.database.projection.projo_add_external_media import (

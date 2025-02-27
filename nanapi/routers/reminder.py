@@ -1,7 +1,7 @@
 from uuid import UUID
 
-from edgedb import AsyncIOClient
 from fastapi import Depends, Response, status
+from gel import AsyncIOClient
 
 from nanapi.database.reminder.reminder_delete_by_id import (
     ReminderDeleteByIdResult,
