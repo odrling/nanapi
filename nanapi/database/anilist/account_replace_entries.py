@@ -1,7 +1,7 @@
 from typing import Any, Literal
 
 import orjson
-from edgedb import AsyncIOExecutor
+from gel import AsyncIOExecutor
 
 EDGEQL_QUERY = r"""
 with

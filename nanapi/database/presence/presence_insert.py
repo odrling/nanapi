@@ -1,7 +1,7 @@
 from typing import Literal
 from uuid import UUID
 
-from edgedb import AsyncIOExecutor
+from gel import AsyncIOExecutor
 from pydantic import BaseModel, TypeAdapter
 
 EDGEQL_QUERY = r"""

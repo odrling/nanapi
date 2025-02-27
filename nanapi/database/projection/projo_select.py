@@ -3,7 +3,7 @@ from enum import StrEnum
 from typing import Literal
 from uuid import UUID
 
-from edgedb import AsyncIOExecutor
+from gel import AsyncIOExecutor
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
 EDGEQL_QUERY = r"""
