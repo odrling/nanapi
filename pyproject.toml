@@ -1,7 +1,7 @@
 [project]
 name = "nanapi"
 version = "0.1.0"
-description = "FastAPI + EdgeDB backend for Nana-chan"
+description = "FastAPI + Gel backend for Nana-chan"
 readme = "README.md"
 license = "MIT"
 authors = [
@@ -40,7 +40,7 @@ dev = [
     "pyright==1.1.394",
     "ruff==0.9.9",
     "uvicorn==0.34.0",
-    "edgedb-pydantic-codegen==2024.10.6",
+    "gel-pydantic-codegen==1.0.0",
     "pyinstrument==5.0.1",
 ]
 

@@ -4,9 +4,9 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "edgedb_pydantic_codegen",
+      "label": "gel_pydantic_codegen",
       "type": "shell",
-      "command": "uv run edgedb-pydantic-codegen nanapi/database/",
+      "command": "uv run gel-pydantic-codegen nanapi/database/",
       "problemMatcher": "$python",
       "group": {
         "kind": "build",

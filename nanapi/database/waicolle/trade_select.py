@@ -98,6 +98,8 @@ class TradeSelectResultOffered(BaseModel):
     original_owner: TradeSelectResultOfferedOriginalOwner | None
     custom_position_waifu: TradeSelectResultOfferedCustomPositionWaifu | None
     id: UUID
+    frozen: bool
+    disabled: bool
     blooded: bool
     custom_collage: bool
     custom_image: str | None
@@ -108,8 +110,6 @@ class TradeSelectResultOffered(BaseModel):
     nanaed: bool
     timestamp: datetime
     trade_locked: bool
-    disabled: bool
-    frozen: bool
 
 
 class TradeSelectResultOffereeUser(BaseModel):
@@ -153,6 +153,8 @@ class TradeSelectResultReceived(BaseModel):
     original_owner: TradeSelectResultReceivedOriginalOwner | None
     custom_position_waifu: TradeSelectResultReceivedCustomPositionWaifu | None
     id: UUID
+    frozen: bool
+    disabled: bool
     blooded: bool
     custom_collage: bool
     custom_image: str | None
@@ -163,8 +165,6 @@ class TradeSelectResultReceived(BaseModel):
     nanaed: bool
     timestamp: datetime
     trade_locked: bool
-    disabled: bool
-    frozen: bool
 
 
 class TradeSelectResultAuthorUser(BaseModel):
@@ -181,10 +181,10 @@ class TradeSelectResult(BaseModel):
     received: list[TradeSelectResultReceived]
     offeree: TradeSelectResultOfferee
     offered: list[TradeSelectResultOffered]
-    blood_shards: int
-    completed_at: datetime | None
-    created_at: datetime
     id: UUID
+    created_at: datetime
+    completed_at: datetime | None
+    blood_shards: int
 
 
 adapter = TypeAdapter(list[TradeSelectResult])

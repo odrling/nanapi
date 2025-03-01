@@ -13,17 +13,17 @@ git clone https://github.com/Japan7/nanapi.git
 cd nanapi/
 ```
 
-### Setup EdgeDB
+### Setup Gel
 
-Follow the installation guide: https://www.edgedb.com/install
+Follow the installation guide: https://docs.geldata.com/learn/cli
 
 Launch and link an instance to the project:
 
 ```sh
-edgedb project init
+gel project init
 ```
 
-Web UI: `edgedb ui`
+Web UI: `gel ui`
 
 ### Setup Meilisearch
 
