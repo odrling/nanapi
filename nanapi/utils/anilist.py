@@ -2,7 +2,7 @@ import asyncio
 import logging
 import time
 from abc import ABC, abstractmethod
-from collections.abc import Generator
+from collections.abc import AsyncGenerator
 from dataclasses import dataclass, field
 from itertools import batched, count, filterfalse
 from typing import Any, Generic, Self, TypeVar, override
@@ -736,12 +736,12 @@ class ALEntity(ABC, Generic[T]):
 
     @classmethod
     @abstractmethod
-    async def load(
-        cls, items: set[Self], full: bool = True, low_priority=False, _start_page: int = 1
-    ) -> Generator[Self, None, None]: ...
+    def load(
+        cls, items: set[Self], full: bool = True, low_priority: bool = False, _start_page: int = 1
+    ) -> AsyncGenerator[Self, Any]: ...
 
 
-def is_complete(d: ALEntity) -> bool:
+def is_complete(d: ALEntity[Any]) -> bool:
     return d.complete.is_set()
 
 
@@ -833,9 +833,14 @@ class Media(ALEntity[ALMedia]):
 
         return found
 
+    @override
     @classmethod
     async def load(
-        cls, items: set['Media'], full: bool = True, low_priority=False, _start_page: int = 1
+        cls,
+        items: set['Media'],
+        full: bool = True,
+        low_priority: bool = False,
+        _start_page: int = 1,
     ):
         complete: set[Media] = set(filter(is_complete, items))
         not_complete: set[Media] = set(filterfalse(is_complete, items))
@@ -986,9 +991,14 @@ class Chara(ALEntity[ALCharacter]):
 
         return found
 
+    @override
     @classmethod
     async def load(
-        cls, items: set['Chara'], full: bool = True, low_priority=False, _start_page: int = 1
+        cls,
+        items: set['Chara'],
+        full: bool = True,
+        low_priority: bool = False,
+        _start_page: int = 1,
     ):
         complete: set[Chara] = set(filter(is_complete, items))
         not_complete: set[Chara] = set(filterfalse(is_complete, items))
@@ -1115,9 +1125,14 @@ class Staff(ALEntity[ALStaff]):
 
         return found
 
+    @override
     @classmethod
     async def load(
-        cls, items: set['Staff'], full: bool = True, low_priority=False, _start_page: int = 1
+        cls,
+        items: set['Staff'],
+        full: bool = True,
+        low_priority: bool = False,
+        _start_page: int = 1,
     ):
         complete: set[Staff] = set(filter(is_complete, items))
         not_complete: set[Staff] = set(filterfalse(is_complete, items))
