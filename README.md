@@ -15,12 +15,10 @@ cd nanapi/
 
 ### Setup Gel
 
-Follow the installation guide: https://docs.geldata.com/learn/cli
-
 Launch and link an instance to the project:
 
 ```sh
-gel project init
+uv run --frozen gel project init
 ```
 
 Web UI: `gel ui`
