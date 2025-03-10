@@ -1,5 +1,6 @@
 import asyncio
 import sys
+from collections.abc import Awaitable, Callable
 from functools import cache
 from typing import Any
 
@@ -127,8 +128,8 @@ async def webhook_post_error(error_msg: str, username: str = INSTANCE_NAME):
         await send_webhook(page, username)
 
 
-def webhook_exceptions(func):
-    async def wrapper(*args, **kwargs):
+def webhook_exceptions[**P, R](func: Callable[P, Awaitable[R]]) -> Callable[P, Awaitable[R]]:
+    async def wrapper(*args: P.args, **kwargs: P.kwargs):
         try:
             return await func(*args, **kwargs)
         except Exception as e:
